@@ -14,6 +14,28 @@ export interface SliderCopy {
   initial: number;
 }
 
+/** Labels used inside the illustrative Pricer preview (not real data). */
+export interface PricerMock {
+  steps: [string, string, string];
+  mailFrom: string;
+  mailSubject: string;
+  extracted: string;
+  fields: string[];
+  offer: string;
+  total: string;
+  ready: string;
+}
+
+/** Labels used inside the illustrative ArchiFlow preview (not real data). */
+export interface ArchiFlowMock {
+  nav: string[];
+  overview: string;
+  projects: string[];
+  statuses: string[];
+  schedule: string;
+  documents: string;
+}
+
 export interface Dictionary {
   meta: { title: string; description: string };
   routes: { home: string; contact: string; pricer: string; archiflow: string };
@@ -59,17 +81,30 @@ export interface Dictionary {
     locale: string;
     currency: string;
   };
-  solutions: { eyebrow: string; title: string; intro: string; items: TitledText[]; statement: string };
+  solutions: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    chooseLabel: string;
+    items: TitledText[];
+    deployment: {
+      label: string;
+      title: string;
+      intro: string;
+      or: string;
+      options: (TitledText & { tags?: string[] })[];
+    };
+    statement: string;
+  };
   products: {
     eyebrow: string;
     title: string;
     intro: string;
     mockNote: string;
-    pricer: { status: string; name: string; text: string; cta: string; mock: { inbox: string; offer: string; formats: string } };
-    archiflow: { status: string; name: string; text: string; cta: string; mock: { columns: string[] } };
+    pricer: { status: string; name: string; text: string; cta: string; mock: PricerMock };
+    archiflow: { status: string; name: string; text: string; cta: string; mock: ArchiFlowMock };
   };
   process: { eyebrow: string; title: string; intro: string; steps: TitledText[]; cta: string };
-  capabilities: { eyebrow: string; title: string; intro: string; items: (TitledText & { tags?: string[] })[] };
   team: {
     eyebrow: string;
     title: string;

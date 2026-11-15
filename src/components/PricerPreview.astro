@@ -1,0 +1,618 @@
+---
+/**
+ * Illustrative Pricer preview (HTML/CSS, no images): client message →
+ * extracted details → prepared quote (Word / PDF). Values are skeleton bars on
+ * purpose — no invented prices, clients or data. Decorative (aria-hidden by parent).
+ */
+import type { PricerMock } from "@/i18n/types";
+
+interface Props {
+  mock: PricerMock;
+}
+const { mock } = Astro.props;
+const valueWidths = [62, 78, 34, 48];
+---
+
+<div class="pr">
+  <div class="win">
+    <div class="win__bar">
+      <span class="win__dots"><i></i><i></i><i></i></span>
+      <span class="win__app mono">Pricer</span>
+      <ol class="flow mono">
+        {
+          mock.steps.map((s, i) => (
+            <li class:list={["flow__step", { "flow__step--done": i < 2, "flow__step--current": i === 2 }]}>
+              <span class="flow__dot" />
+              {s}
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div class="stage">
+      <!-- 1. Client message -->
+      <div class="card mail">
+        <div class="mail__head">
+          <span class="avatar">{mock.mailFrom.charAt(0)}</span>
+          <div class="mail__meta">
+            <span class="mail__from">{mock.mailFrom}</span>
+            <span class="mail__subject">{mock.mailSubject}</span>
+          </div>
+          <span class="tag tag--new mono">1</span>
+        </div>
+        <div class="mail__body">
+          <span class="ln" style="width:88%"></span>
+          <span class="ln-row"><span class="ln" style="width:30%"></span><span class="hl hl--a"></span><span class="ln" style="width:22%"></span></span>
+          <span class="ln-row"><span class="hl hl--b"></span><span class="ln" style="width:46%"></span></span>
+          <span class="ln-row"><span class="ln" style="width:38%"></span><span class="hl hl--c"></span></span>
+          <span class="ln" style="width:56%"></span>
+        </div>
+        <div class="attach">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 4.5 5.8 9.2a1.5 1.5 0 0 0 2.1 2.1l5-5a3 3 0 0 0-4.2-4.2l-5 5a4.5 4.5 0 0 0 6.4 6.4l3.4-3.4" fill="none" stroke="currentColor" stroke-width="1.3"></path></svg>
+          <span class="ln" style="width:70px"></span>
+        </div>
+      </div>
+
+      <!-- 2. Extracted details -->
+      <div class="card extract">
+        <p class="extract__title mono"><span class="pulse-dot"></span>{mock.extracted}</p>
+        <ul class="fields">
+          {
+            mock.fields.map((f, i) => (
+              <li class="field">
+                <span class="field__label">{f}</span>
+                <span class="field__value" style={`--w:${valueWidths[i % valueWidths.length]}%`} />
+                <svg class="field__ok" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.6" />
+                </svg>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- 3. Prepared quote -->
+      <div class="doc">
+        <div class="doc__head">
+          <span class="doc__logo"></span>
+          <div class="doc__titles">
+            <span class="doc__title">{mock.offer}</span>
+            <span class="ln ln--doc" style="width:64px"></span>
+          </div>
+          <span class="ln ln--doc" style="width:46px"></span>
+        </div>
+        <div class="doc__to">
+          <span class="ln ln--doc" style="width:42%"></span>
+          <span class="ln ln--doc" style="width:30%"></span>
+        </div>
+        <div class="doc__table">
+          {
+            [72, 58, 66, 44].map((w) => (
+              <div class="doc__row">
+                <span class="ln ln--doc" style={`width:${w}%`} />
+                <span class="ln ln--doc ln--num" />
+              </div>
+            ))
+          }
+        </div>
+        <div class="doc__total">
+          <span class="doc__total-label">{mock.total}</span>
+          <span class="ln ln--strong"></span>
+        </div>
+        <div class="doc__foot">
+          <span class="fmt fmt--word mono"><b>W</b>Word</span>
+          <span class="fmt fmt--pdf mono"><b>P</b>PDF</span>
+          <span class="doc__ready">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg>
+            {mock.ready}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pr {
+    container-type: inline-size;
+    position: relative;
+  }
+
+  /* Soft backdrop light behind the window */
+  .pr::before {
+    content: "";
+    position: absolute;
+    inset: 8% 4% -4%;
+    background: radial-gradient(ellipse at 70% 40%, rgb(31 140 165 / 0.22), transparent 65%);
+    filter: blur(30px);
+    z-index: 0;
+  }
+
+  /* ---------- Window chrome (shared language with ArchiFlow) ---------- */
+  .win {
+    position: relative;
+    z-index: 1;
+    border: 1px solid #2b3236;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #171c20, #111518);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.05) inset,
+      0 40px 80px -40px rgb(0 0 0 / 0.9);
+    overflow: hidden;
+  }
+
+  .win__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid #252b2f;
+    background: rgb(255 255 255 / 0.015);
+  }
+
+  .win__dots {
+    display: flex;
+    gap: 5px;
+  }
+  .win__dots i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #30373b;
+  }
+
+  .win__app {
+    font-size: 0.6875rem;
+    color: var(--color-text);
+    letter-spacing: 0.04em;
+  }
+
+  .flow {
+    margin: 0 0 0 auto;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .flow__step {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+  }
+
+  .flow__step + .flow__step::before {
+    content: "";
+    width: 14px;
+    height: 1px;
+    background: #3a4247;
+    margin-right: 0.15rem;
+  }
+
+  .flow__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: 1px solid #4a5357;
+  }
+
+  .flow__step--done .flow__dot {
+    background: var(--color-brand-teal);
+    border-color: var(--color-brand-teal);
+  }
+
+  .flow__step--current {
+    color: var(--color-text);
+  }
+
+  .flow__step--current .flow__dot {
+    background: var(--color-brand-red);
+    border-color: var(--color-brand-red);
+    box-shadow: 0 0 0 3px rgb(228 0 58 / 0.18);
+  }
+
+  /* ---------- Stage ---------- */
+  .stage {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+    background:
+      radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.045) 1px, transparent 0) 0 0 / 14px 14px;
+  }
+
+  .card {
+    position: relative;
+    border: 1px solid #2d3439;
+    border-radius: 10px;
+    background: #1b2125;
+    padding: 0.85rem;
+    box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.9);
+  }
+
+  .ln {
+    display: block;
+    height: 6px;
+    border-radius: 3px;
+    background: #353d42;
+    flex: none;
+  }
+
+  .ln-row {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  /* Mail */
+  .mail__head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-bottom: 0.7rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #2a3135;
+  }
+
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2a6f80, #1f8ca5);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .mail__meta {
+    display: grid;
+    min-width: 0;
+    line-height: 1.25;
+  }
+
+  .mail__from {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .mail__subject {
+    font-size: 0.6875rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tag {
+    margin-left: auto;
+    font-size: 0.5625rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 999px;
+  }
+
+  .tag--new {
+    background: var(--color-brand-red);
+    color: #fff;
+  }
+
+  .mail__body {
+    display: grid;
+    gap: 7px;
+  }
+
+  /* Highlighted fragments = information picked up from the message */
+  .hl {
+    display: block;
+    height: 10px;
+    border-radius: 3px;
+    background: rgb(31 140 165 / 0.28);
+    box-shadow: inset 0 0 0 1px rgb(79 179 203 / 0.65);
+    flex: none;
+  }
+  .hl--a {
+    width: 26%;
+  }
+  .hl--b {
+    width: 34%;
+  }
+  .hl--c {
+    width: 22%;
+  }
+
+  .attach {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.8rem;
+    padding: 0.35rem 0.55rem;
+    border: 1px solid #2d3439;
+    border-radius: 6px;
+    color: var(--color-text-muted);
+  }
+
+  .attach svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Extracted details */
+  .extract {
+    background: linear-gradient(180deg, #1f272c, #1a2024);
+    border-color: rgb(31 140 165 / 0.45);
+  }
+
+  .extract__title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-teal-text);
+    margin-bottom: 0.6rem;
+  }
+
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-teal-text);
+    box-shadow: 0 0 0 3px rgb(79 179 203 / 0.18);
+  }
+
+  .fields {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .field {
+    display: grid;
+    grid-template-columns: 4.6rem minmax(0, 1fr) 14px;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    background: rgb(255 255 255 / 0.025);
+  }
+
+  .field__label {
+    font-size: 0.6875rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .field__value {
+    height: 6px;
+    width: var(--w);
+    border-radius: 3px;
+    background: #4a565c;
+  }
+
+  .field__ok {
+    width: 14px;
+    height: 14px;
+    color: var(--color-teal-text);
+  }
+
+  /* Quote document (light paper) */
+  .doc {
+    position: relative;
+    display: grid;
+    gap: 0.8rem;
+    align-content: start;
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f7f7f5;
+    color: var(--color-light-text);
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 0.06),
+      0 30px 60px -24px rgb(0 0 0 / 0.85);
+  }
+
+  .ln--doc {
+    background: #dfe2df;
+  }
+
+  .ln--num {
+    width: 18%;
+    margin-left: auto;
+  }
+
+  .ln--strong {
+    width: 26%;
+    height: 8px;
+    background: var(--color-light-text);
+  }
+
+  .doc__head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e3e5e2;
+  }
+
+  .doc__logo {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    border-radius: 4px;
+    background: linear-gradient(135deg, var(--color-brand-red) 50%, var(--color-brand-teal) 50%);
+  }
+
+  .doc__titles {
+    display: grid;
+    gap: 4px;
+    margin-right: auto;
+  }
+
+  .doc__title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .doc__to {
+    display: grid;
+    gap: 5px;
+  }
+
+  .doc__table {
+    display: grid;
+    gap: 0;
+    border: 1px solid #e6e8e5;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .doc__row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .doc__row:nth-child(odd) {
+    background: #eff0ee;
+  }
+
+  .doc__total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.2rem;
+  }
+
+  .doc__total-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .doc__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e3e5e2;
+  }
+
+  .fmt {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.45rem 0.2rem 0.2rem;
+    border: 1px solid #dcdfdc;
+    border-radius: 5px;
+    background: #fff;
+    font-size: 0.625rem;
+    color: var(--color-light-muted);
+  }
+
+  .fmt b {
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    font-size: 0.5625rem;
+    color: #fff;
+  }
+
+  .fmt--word b {
+    background: var(--color-brand-teal);
+  }
+
+  .fmt--pdf b {
+    background: var(--color-brand-red);
+  }
+
+  .doc__ready {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-left: auto;
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: #17707f;
+    white-space: nowrap;
+  }
+
+  .doc__ready svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Narrow: steps hidden in the bar, connectors between stacked cards */
+  @container (max-width: 459px) {
+    .flow {
+      display: none;
+    }
+    .extract::before,
+    .doc::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -0.75rem;
+      width: 1px;
+      height: 0.75rem;
+      background: var(--color-brand-teal);
+    }
+  }
+
+  /* Wide: layered composition — message, details overlapping it, quote in front */
+  @container (min-width: 460px) {
+    .stage {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-template-rows: auto auto;
+      gap: 0;
+      padding: 1.25rem 1.25rem 1.5rem;
+    }
+    .mail {
+      grid-column: 1 / 8;
+      grid-row: 1;
+      padding-bottom: 2.5rem;
+    }
+    .extract {
+      grid-column: 2 / 8;
+      grid-row: 2;
+      margin-top: -1.75rem;
+      z-index: 2;
+    }
+    .doc {
+      grid-column: 7 / 13;
+      grid-row: 1 / 3;
+      margin-top: 1.25rem;
+      margin-left: -0.25rem;
+      z-index: 3;
+      transform: rotate(0.6deg);
+    }
+  }
+
+  @container (min-width: 600px) {
+    .stage {
+      padding: 1.75rem 1.75rem 2rem;
+    }
+    .doc {
+      padding: 1.15rem;
+    }
+  }
+</style>

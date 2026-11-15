@@ -104,6 +104,7 @@ export const pl: Dictionary = {
     title: "Najpierw poznajemy Twoją firmę. Potem dobieramy rozwiązanie.",
     intro:
       "Każda firma działa inaczej. Dlatego najpierw poznajemy sposób pracy i szukamy miejsca, w którym można coś uprościć. Dopiero później dobieramy rozwiązanie — takie, które ma sens biznesowy i technologiczny.",
+    chooseLabel: "Dobieramy rozwiązanie",
     items: [
       { title: "Automatyzacja procesów", text: "Ograniczamy ręczne, powtarzalne zadania i usprawniamy przepływ pracy." },
       {
@@ -119,26 +120,44 @@ export const pl: Dictionary = {
         text: "Łączymy używane narzędzia, aby informacje przepływały między nimi bez ręcznego kopiowania.",
       },
     ],
+    deployment: {
+      label: "Dopasowujemy wdrożenie",
+      title: "Technologia powinna pasować do Twojej firmy. Nie odwrotnie.",
+      intro:
+        "Niezależnie od tego, czy potrzebujesz prostej automatyzacji, dedykowanej aplikacji czy rozwiązania wykorzystującego AI, dobieramy sposób wdrożenia do Twoich procesów i warunków.",
+      or: "lub",
+      options: [
+        {
+          title: "Chmura",
+          text: "Możemy wykorzystać AWS, Azure lub Google Cloud, jeśli chmura jest właściwym wyborem dla danego rozwiązania.",
+          tags: ["AWS", "Azure", "Google Cloud"],
+        },
+        {
+          title: "Środowisko lokalne",
+          text: "Rozwiązania mogą działać również w infrastrukturze Twojej firmy, jeśli wymagają tego procesy lub zasady organizacji.",
+        },
+      ],
+    },
     statement: "Nie każda firma potrzebuje AI. Każda potrzebuje rozwiązania, które ma sens.",
   },
   products: {
     eyebrow: "04 / Przykładowe rozwiązania",
-    title: "Od problemu do działającego rozwiązania.",
-    intro: "Zobacz przykłady narzędzi, które rozwijamy, aby usprawniać konkretne procesy biznesowe.",
+    title: "Produkty, które mogą pomóc Twojej firmie już dziś.",
+    intro: "Poznaj narzędzia, które rozwijamy, aby usprawniać konkretne procesy biznesowe.",
     mockNote: "Makieta poglądowa",
     pricer: {
       status: "Gotowy produkt",
       name: "Pricer",
       text: "Automatyzacja przygotowywania ofert na podstawie wiadomości i informacji otrzymanych od klienta. Mniej ręcznego przepisywania, bardziej uporządkowany proces przygotowania wyceny.",
       cta: "Poznaj Pricer",
-      mock: { inbox: "Wiadomość od klienta", offer: "Oferta", formats: "Word · PDF" },
+      mock: {"steps": ["Wiadomość", "Analiza", "Oferta"], "mailFrom": "Klient", "mailSubject": "Zapytanie ofertowe", "extracted": "Dane z wiadomości", "fields": ["Klient", "Zakres", "Ilość", "Termin"], "offer": "Oferta", "total": "Razem", "ready": "Gotowa do wysłania"},
     },
     archiflow: {
       status: "W trakcie rozwoju",
       name: "ArchiFlow",
       text: "System rozwijany z myślą o biurach architektonicznych, który ma wspierać organizację projektów, harmonogramów, zespołu i dokumentacji.",
       cta: "Poznaj ArchiFlow",
-      mock: { columns: ["Projekty", "Harmonogram", "Dokumentacja"] },
+      mock: {"nav": ["Projekty", "Harmonogram", "Zespół", "Dokumenty", "Klienci"], "overview": "Aktywne projekty", "projects": ["Projekt A", "Projekt B", "Projekt C"], "statuses": ["Koncepcja", "Projekt budowlany", "Projekt wykonawczy"], "schedule": "Harmonogram", "documents": "Dokumenty"},
     },
   },
   process: {
@@ -154,33 +173,8 @@ export const pl: Dictionary = {
     ],
     cta: "Porozmawiajmy o Twoim problemie",
   },
-  capabilities: {
-    eyebrow: "06 / Elastyczne wdrożenie",
-    title: "Technologia powinna pasować do Twojej firmy. Nie odwrotnie.",
-    intro:
-      "Niezależnie od tego, czy potrzebujesz prostej automatyzacji, dedykowanej aplikacji czy rozwiązania wykorzystującego AI, dobieramy sposób wdrożenia do Twoich procesów i warunków.",
-    items: [
-      {
-        title: "Chmura",
-        text: "Możemy wykorzystać AWS, Azure lub Google Cloud, jeśli chmura jest właściwym wyborem dla danego rozwiązania.",
-        tags: ["AWS", "Azure", "Google Cloud"],
-      },
-      {
-        title: "Środowisko lokalne",
-        text: "Rozwiązania mogą działać również w infrastrukturze Twojej firmy, jeśli wymagają tego procesy lub zasady organizacji.",
-      },
-      {
-        title: "AI i automatyzacja",
-        text: "Od prostych przepływów pracy po rozwiązania wykorzystujące modele AI — wybieramy poziom złożoności odpowiedni do zadania.",
-      },
-      {
-        title: "Aplikacje i integracje",
-        text: "Budujemy narzędzia i łączymy systemy, aby lepiej wspierały codzienną pracę.",
-      },
-    ],
-  },
   team: {
-    eyebrow: "07 / Dlaczego my?",
+    eyebrow: "06 / Dlaczego my?",
     title: "Technologia to narzędzie. Najważniejsze jest to, co dzięki niej zmienisz.",
     pillars: [
       { title: "Najpierw słuchamy", text: "Zanim zaproponujemy rozwiązanie, chcemy zrozumieć, jak działa Twoja firma." },
@@ -198,7 +192,7 @@ export const pl: Dictionary = {
     placeholderNote: "Zdjęcie i opis do uzupełnienia",
   },
   faq: {
-    eyebrow: "08 / FAQ",
+    eyebrow: "07 / FAQ",
     title: "Najczęstsze pytania",
     items: [
       {

@@ -105,6 +105,7 @@ export const en: Dictionary = {
     title: "First, we get to know your business. Then we find the right solution.",
     intro:
       "Every company works differently. That's why we first learn how you work and look for the place where something can be simplified. Only then do we choose a solution — one that makes sense both for the business and technically.",
+    chooseLabel: "Choosing the solution",
     items: [
       { title: "Process automation", text: "We reduce manual, repetitive tasks and streamline the flow of work." },
       {
@@ -120,26 +121,44 @@ export const en: Dictionary = {
         text: "We connect the tools you already use so information flows between them without manual copying.",
       },
     ],
+    deployment: {
+      label: "Fitting the deployment",
+      title: "Technology should fit your company. Not the other way around.",
+      intro:
+        "Whether you need a simple automation, a custom application or a solution that uses AI, we choose how to deliver it based on your processes and constraints.",
+      or: "or",
+      options: [
+        {
+          title: "Cloud",
+          text: "We can use AWS, Azure or Google Cloud when the cloud is the right choice for a given solution.",
+          tags: ["AWS", "Azure", "Google Cloud"],
+        },
+        {
+          title: "On-premises",
+          text: "Solutions can also run on your company's own infrastructure if your processes or policies require it.",
+        },
+      ],
+    },
     statement: "Not every company needs AI. Every company needs a solution that makes sense.",
   },
   products: {
     eyebrow: "04 / Example solutions",
-    title: "From a problem to a working solution.",
-    intro: "Examples of tools we are developing to improve specific business processes.",
+    title: "Products that can help your business today.",
+    intro: "Explore the tools we develop to improve specific business processes.",
     mockNote: "Illustrative mock-up",
     pricer: {
       status: "Available product",
       name: "Pricer",
       text: "Automates preparing quotes based on emails and information received from the client. Less manual re-typing, a more organised quoting process.",
       cta: "Discover Pricer",
-      mock: { inbox: "Client message", offer: "Quote", formats: "Word · PDF" },
+      mock: {"steps": ["Message", "Analysis", "Quote"], "mailFrom": "Client", "mailSubject": "Request for a quote", "extracted": "Extracted details", "fields": ["Client", "Scope", "Quantity", "Deadline"], "offer": "Quote", "total": "Total", "ready": "Ready to send"},
     },
     archiflow: {
       status: "In development",
       name: "ArchiFlow",
       text: "A system being developed for architecture studios, designed to support the organisation of projects, schedules, the team and documentation.",
       cta: "Discover ArchiFlow",
-      mock: { columns: ["Projects", "Schedule", "Documentation"] },
+      mock: {"nav": ["Projects", "Schedule", "Team", "Documents", "Clients"], "overview": "Active projects", "projects": ["Project A", "Project B", "Project C"], "statuses": ["Concept", "Permit design", "Detailed design"], "schedule": "Schedule", "documents": "Documents"},
     },
   },
   process: {
@@ -155,33 +174,8 @@ export const en: Dictionary = {
     ],
     cta: "Let's talk about your problem",
   },
-  capabilities: {
-    eyebrow: "06 / Flexible delivery",
-    title: "Technology should fit your company. Not the other way around.",
-    intro:
-      "Whether you need a simple automation, a custom application or a solution that uses AI, we choose how to deliver it based on your processes and constraints.",
-    items: [
-      {
-        title: "Cloud",
-        text: "We can use AWS, Azure or Google Cloud when the cloud is the right choice for a given solution.",
-        tags: ["AWS", "Azure", "Google Cloud"],
-      },
-      {
-        title: "On-premises",
-        text: "Solutions can also run on your company's own infrastructure if your processes or policies require it.",
-      },
-      {
-        title: "AI and automation",
-        text: "From simple workflows to solutions using AI models — we choose the level of complexity the task actually calls for.",
-      },
-      {
-        title: "Applications and integrations",
-        text: "We build tools and connect systems so they better support everyday work.",
-      },
-    ],
-  },
   team: {
-    eyebrow: "07 / Why us",
+    eyebrow: "06 / Why us",
     title: "Technology is a tool. What matters is what you change with it.",
     pillars: [
       { title: "We listen first", text: "Before we propose anything, we want to understand how your company works." },
@@ -199,7 +193,7 @@ export const en: Dictionary = {
     placeholderNote: "Photo and bio to be added",
   },
   faq: {
-    eyebrow: "08 / FAQ",
+    eyebrow: "07 / FAQ",
     title: "Frequently asked questions",
     items: [
       {

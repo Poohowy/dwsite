@@ -1,93 +1,342 @@
 ---
+/**
+ * "Nasze podejście" — one story in three steps, connected by a central line:
+ *   1. We get to know the company (section heading + intro)
+ *   2. We choose the right kind of solution (four categories, one shared panel)
+ *   3. We fit the deployment to the client (cloud or on-premises, dark inset)
+ * …closing with the positioning statement.
+ * (Merges the former "Nasze podejście" and "Elastyczne wdrożenie" sections.)
+ */
 import Icon from "@/components/Icon.astro";
-import type { IconName } from "@/lib/icons";
 import SectionHead from "@/components/SectionHead.astro";
 import { t, type Lang } from "@/i18n";
+import type { IconName } from "@/lib/icons";
 
 interface Props {
   lang: Lang;
 }
 const d = t(Astro.props.lang).solutions;
+const dep = d.deployment;
 const icons: IconName[] = ["automation", "ai", "app", "integration"];
+const envIcons: IconName[] = ["cloud", "server"];
 ---
 
 <section class="section light solutions" aria-labelledby="solutions-title">
   <div class="container">
     <SectionHead id="solutions-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} layout="center" />
 
-    <ul role="list" class="solutions__grid">
-      {
-        d.items.map((item, i) => (
-          <li class="solution" data-reveal data-spotlight>
-            <div class="solution__top">
-              <Icon name={icons[i]} class="solution__icon" />
-              <span class="mono solution__num">{String(i + 1).padStart(2, "0")}</span>
-            </div>
-            <h3 class="h3">{item.title}</h3>
-            <p class="muted">{item.text}</p>
-          </li>
-        ))
-      }
-    </ul>
+    <div class="story">
+      <span class="story__link" aria-hidden="true" data-reveal="fade"></span>
 
-    <p class="statement" data-reveal>
-      <span class="statement__mark" aria-hidden="true"></span>
-      {d.statement}
-    </p>
+      <!-- Step 1: choosing the solution -->
+      <div class="part" role="group" aria-labelledby="solutions-choose">
+        <h3 class="part__label mono" id="solutions-choose" data-reveal="fade">
+          <span class="part__num">01</span>
+          {d.chooseLabel}
+        </h3>
+        <ul role="list" class="choose">
+          {
+            d.items.map((item, i) => (
+              <li class="choose__item" data-reveal data-spotlight>
+                <div class="choose__top">
+                  <Icon name={icons[i]} class="choose__icon" />
+                  <span class="mono choose__num">{String(i + 1).padStart(2, "0")}</span>
+                </div>
+                <h4 class="h3">{item.title}</h4>
+                <p class="muted">{item.text}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <span class="story__link" aria-hidden="true" data-reveal="fade"></span>
+
+      <!-- Step 2: fitting the deployment -->
+      <div class="part part--deploy" role="group" aria-labelledby="solutions-deploy">
+        <h3 class="part__label part__label--dark mono" id="solutions-deploy" data-reveal="fade">
+          <span class="part__num">02</span>
+          {dep.label}
+        </h3>
+        <div class="deploy" data-reveal>
+          <div class="deploy__text">
+            <h4 class="deploy__title">{dep.title}</h4>
+            <p class="deploy__intro">{dep.intro}</p>
+          </div>
+          <ul role="list" class="deploy__options">
+            {
+              dep.options.map((opt, i) => (
+                <>
+                  {i > 0 && (
+                    <li class="deploy__or mono" aria-hidden="true">
+                      <span>{dep.or}</span>
+                    </li>
+                  )}
+                  <li class="env">
+                    <div class="env__head">
+                      <Icon name={envIcons[i]} class="env__icon" />
+                      <span class="env__title">{opt.title}</span>
+                    </div>
+                    <p class="env__text">{opt.text}</p>
+                    {opt.tags && (
+                      <ul role="list" class="env__tags">
+                        {opt.tags.map((tag) => (
+                          <li class="mono">{tag}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                </>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      <span class="story__link" aria-hidden="true" data-reveal="fade"></span>
+
+      <p class="statement" data-reveal>
+        <span class="statement__mark" aria-hidden="true"></span>
+        {d.statement}
+      </p>
+    </div>
   </div>
 </section>
 
 <style>
-  .solutions__grid {
+  .story {
     display: grid;
-    gap: 1rem;
+    justify-items: center;
   }
 
-  .solution {
+  /* Central connector between the steps of the story */
+  .story__link {
+    display: block;
+    width: 1px;
+    height: clamp(2.5rem, 2rem + 2vw, 4rem);
+    background: linear-gradient(var(--color-light-border), var(--color-brand-red));
+  }
+
+  .story > .story__link:first-child {
+    margin-top: -0.5rem;
+    background: linear-gradient(transparent, var(--color-light-border) 40%, var(--color-brand-red));
+  }
+
+  /* ----- Part (step) frame with a label sitting on its top edge ----- */
+  .part {
+    position: relative;
+    width: 100%;
+    display: grid;
+    justify-items: center;
+  }
+
+  .part__label {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: -1rem;
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--color-light-border);
+    border-radius: 999px;
+    background: var(--color-light-bg);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-light-text);
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .part__num {
+    color: var(--color-brand-red);
+  }
+
+  .part__label--dark {
+    background: var(--color-bg);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  /* ----- Step 1: four solution types in one shared panel ----- */
+  .choose {
+    width: 100%;
+    display: grid;
+    background: var(--color-light-surface);
+    border: 1px solid var(--color-light-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    padding-top: 1rem;
+  }
+
+  .choose__item {
     display: grid;
     align-content: start;
     gap: 0.75rem;
-    padding: clamp(1.5rem, 1.2rem + 1vw, 2rem);
-    background: var(--color-light-surface);
-    border: 1px solid var(--color-light-border);
-    border-radius: var(--radius);
-    transition: border-color var(--dur) var(--ease-out);
+    padding: clamp(1.5rem, 1.2rem + 1vw, 2.25rem);
+    border-top: 1px solid var(--color-light-border);
   }
 
-  .solution:hover {
-    border-color: var(--color-light-muted);
+  .choose__item:first-child {
+    border-top: 0;
   }
 
-  .solution__top {
+  .choose__top {
     display: flex;
     justify-content: space-between;
     align-items: start;
-    margin-bottom: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+    margin-bottom: clamp(0.75rem, 0.4rem + 1.5vw, 2rem);
   }
 
-  .solution :global(.solution__icon) {
+  .choose :global(.choose__icon) {
     width: 32px;
     height: 32px;
     color: var(--color-brand-teal);
   }
 
-  .solution__num {
+  .choose__num {
     font-size: var(--text-xs);
     color: var(--color-light-muted);
   }
 
-  .solution p {
+  .choose__item p {
     font-size: 0.9375rem;
   }
 
-  /* Standalone typographic statement with generous whitespace */
+  /* ----- Step 2: deployment, a smaller dark inset ----- */
+  .part--deploy {
+    max-width: 1080px;
+  }
+
+  .deploy {
+    width: 100%;
+    display: grid;
+    gap: 2rem;
+    padding: clamp(2rem, 1.5rem + 2vw, 3rem) clamp(1.25rem, 0.8rem + 2vw, 3rem) clamp(1.5rem, 1rem + 2vw, 3rem);
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(ellipse 60% 120% at 100% 0, rgb(31 140 165 / 0.12), transparent 60%),
+      var(--color-bg);
+    color: var(--color-text);
+    color-scheme: dark;
+    box-shadow: 0 30px 60px -40px rgb(11 13 15 / 0.6);
+  }
+
+  .deploy__text {
+    display: grid;
+    gap: 0.9rem;
+    align-content: start;
+  }
+
+  .deploy__title {
+    font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+
+  .deploy__intro {
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .deploy__options {
+    display: grid;
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .env {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+
+  .env__head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .env :global(.env__icon) {
+    width: 26px;
+    height: 26px;
+    color: var(--color-teal-text);
+    flex: none;
+  }
+
+  .env__title {
+    font-size: var(--text-h3);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .env__text {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    line-height: 1.55;
+  }
+
+  .env__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .env__tags li {
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    padding: 0.25rem 0.55rem;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    color: var(--color-text-muted);
+  }
+
+  /* "or" between the two environments */
+  .deploy__or {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 2.75rem;
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .deploy__or::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: var(--color-border);
+  }
+
+  .deploy__or span {
+    position: relative;
+    padding: 0.2rem 0.55rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-bg);
+  }
+
+  /* ----- Closing statement ----- */
   .statement {
     display: grid;
     justify-items: center;
     gap: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
-    margin: clamp(5rem, 3.5rem + 6vw, 9rem) auto 0;
-    padding-top: clamp(3rem, 2rem + 3vw, 5rem);
-    border-top: 1px solid var(--color-light-border);
+    margin: 0 auto;
+    padding-top: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
     font-size: clamp(1.9rem, 1.1rem + 3.4vw, 4.25rem);
     font-weight: 600;
     letter-spacing: -0.045em;
@@ -104,14 +353,53 @@ const icons: IconName[] = ["automation", "ai", "app", "integration"];
   }
 
   @media (min-width: 640px) {
-    .solutions__grid {
+    .choose {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .choose__item {
+      border-top: 0;
+    }
+    .choose__item:nth-child(even) {
+      border-left: 1px solid var(--color-light-border);
+    }
+    .choose__item:nth-child(n + 3) {
+      border-top: 1px solid var(--color-light-border);
+    }
+  }
+
+  @media (min-width: 760px) {
+    .deploy__options {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    }
+    .deploy__or {
+      height: auto;
+      width: 3rem;
+    }
+    .deploy__or::before {
+      top: 50%;
+      bottom: auto;
+      left: 0;
+      right: 0;
+      width: auto;
+      height: 1px;
     }
   }
 
   @media (min-width: 1100px) {
-    .solutions__grid {
+    .choose {
       grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .choose__item:nth-child(n) {
+      border-top: 0;
+      border-left: 1px solid var(--color-light-border);
+    }
+    .choose__item:first-child {
+      border-left: 0;
+    }
+    .deploy {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr);
+      gap: clamp(2rem, 1rem + 3vw, 4rem);
+      align-items: center;
     }
   }
 </style>

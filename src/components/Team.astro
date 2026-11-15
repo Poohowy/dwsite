@@ -9,7 +9,7 @@ const d = t(Astro.props.lang).team;
 
 /**
  * TODO(content): replace placeholders with approved names, real photos
- * (e.g. /public/images/team/*.webp, ~800×1000) and approved competence notes.
+ * (e.g. /public/images/team/*.webp, square ~600×600, face roughly centred) and approved competence notes.
  * Do not add job titles that have not been confirmed.
  */
 const members: { name?: string; photo?: string; note?: string }[] = [{}, {}, {}];
@@ -43,7 +43,7 @@ const members: { name?: string; photo?: string; note?: string }[] = [{}, {}, {}]
             <li class="person" data-reveal>
               <div class="person__photo">
                 {m.photo ? (
-                  <img src={m.photo} alt={m.name ?? ""} width="800" height="1000" loading="lazy" decoding="async" />
+                  <img src={m.photo} alt={m.name ?? ""} width="600" height="600" loading="lazy" decoding="async" />
                 ) : (
                   <div class="person__placeholder" aria-hidden="true">
                     <svg viewBox="0 0 80 100" fill="none">
@@ -112,29 +112,38 @@ const members: { name?: string; photo?: string; note?: string }[] = [{}, {}, {}]
   }
 
   .people__list {
+    --portrait: clamp(128px, 22vw, 176px);
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    gap: 2rem 1.25rem;
   }
 
   .person {
     display: grid;
+    justify-items: center;
     gap: 0.35rem;
+    text-align: center;
   }
 
+  /* Circular portrait: same size for every member, face-centred crop */
   .person__photo {
-    aspect-ratio: 4 / 5;
+    width: var(--portrait);
+    aspect-ratio: 1;
+    border-radius: 50%;
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
+    box-shadow:
+      0 0 0 6px var(--color-bg),
+      0 0 0 7px var(--color-border-soft);
     overflow: hidden;
     background: var(--color-surface);
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
   }
 
   .person__photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: 50% 30%;
     filter: grayscale(1) contrast(1.05);
     transition: filter 500ms var(--ease-out);
   }
@@ -154,7 +163,8 @@ const members: { name?: string; photo?: string; note?: string }[] = [{}, {}, {}]
   }
 
   .person__placeholder svg {
-    width: 45%;
+    width: 46%;
+    transform: translateY(10%);
   }
 
   .person__name {

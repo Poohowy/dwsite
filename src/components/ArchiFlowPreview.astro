@@ -1,0 +1,515 @@
+---
+/**
+ * Illustrative ArchiFlow preview (HTML/CSS): a project-organisation dashboard for
+ * an architecture studio — navigation, active projects with statuses, a schedule.
+ * Generic placeholder names, no figures or claims about specific features.
+ * Decorative (aria-hidden by parent). ArchiFlow is in development.
+ */
+import type { ArchiFlowMock } from "@/i18n/types";
+
+interface Props {
+  mock: ArchiFlowMock;
+}
+const { mock } = Astro.props;
+
+const projects = mock.projects.map((name, i) => ({
+  name,
+  status: mock.statuses[i % mock.statuses.length],
+  tone: ["teal", "light", "red"][i % 3],
+  progress: [32, 58, 81][i % 3],
+}));
+
+// Schedule bars: [start %, width %] on a 12-column week grid
+const bars: [number, number][] = [
+  [4, 38],
+  [22, 46],
+  [52, 40],
+];
+---
+
+<div class="af">
+  <div class="win">
+    <div class="win__bar">
+      <span class="win__dots"><i></i><i></i><i></i></span>
+      <span class="win__app mono">ArchiFlow</span>
+      <span class="win__search"><span></span></span>
+    </div>
+
+    <div class="app">
+      <!-- Sidebar -->
+      <nav class="side">
+        <span class="side__logo"></span>
+        <ul>
+          {
+            mock.nav.map((item, i) => (
+              <li class:list={["side__item", { "side__item--active": i === 0 }]}>
+                <span class="side__icon" data-i={i} />
+                <span class="side__label">{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <!-- Main -->
+      <div class="main">
+        <div class="main__head">
+          <span class="main__title">{mock.overview}</span>
+          <span class="team-stack">
+            <i style="--c:#1f8ca5"></i><i style="--c:#6b7a80"></i><i style="--c:#e4003a"></i>
+          </span>
+        </div>
+
+        <div class="projects">
+          {
+            projects.map((p) => (
+              <div class="proj">
+                <div class="proj__thumb" data-tone={p.tone}>
+                  <svg viewBox="0 0 80 40" preserveAspectRatio="none" aria-hidden="true">
+                    <path d="M6 34V14l18-8 18 8v20M42 34V20h14v14M56 34V10h18v24M2 34h76" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" />
+                  </svg>
+                </div>
+                <span class="proj__name">{p.name}</span>
+                <span class="pill" data-tone={p.tone}>{p.status}</span>
+                <span class="bar"><span style={`width:${p.progress}%`} data-tone={p.tone} /></span>
+                <span class="proj__meta">
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M4 1.5h5.5L12.5 4.5v10h-8.5z M9.5 1.5v3h3" fill="none" stroke="currentColor" stroke-width="1.2" />
+                  </svg>
+                  {mock.documents}
+                </span>
+              </div>
+            ))
+          }
+        </div>
+
+        <div class="sched">
+          <div class="sched__head">
+            <span class="sched__title">{mock.schedule}</span>
+            <span class="sched__weeks">{Array.from({ length: 12 }).map(() => <i />)}</span>
+          </div>
+          <div class="sched__rows">
+            {
+              projects.map((p, i) => (
+                <div class="sched__row">
+                  <span class="sched__name">{p.name}</span>
+                  <span class="sched__track">
+                    <span
+                      class="sched__bar"
+                      data-tone={p.tone}
+                      style={`left:${bars[i][0]}%;width:${bars[i][1]}%`}
+                    />
+                  </span>
+                </div>
+              ))
+            }
+            <span class="sched__today"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .af {
+    container-type: inline-size;
+    position: relative;
+    --tone-teal: #1f8ca5;
+    --tone-teal-text: #6cc3d6;
+    --tone-light: #c9ced0;
+    --tone-red: #e4003a;
+    --tone-red-text: #ff5b80;
+  }
+
+  .af::before {
+    content: "";
+    position: absolute;
+    inset: 8% 6% -4%;
+    background:
+      radial-gradient(ellipse at 30% 40%, rgb(31 140 165 / 0.18), transparent 60%),
+      radial-gradient(ellipse at 85% 80%, rgb(228 0 58 / 0.08), transparent 60%);
+    filter: blur(30px);
+  }
+
+  /* ---------- Window chrome (shared language with Pricer) ---------- */
+  .win {
+    position: relative;
+    z-index: 1;
+    border: 1px solid #2b3236;
+    border-radius: 14px;
+    background: #12171a;
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.05) inset,
+      0 40px 80px -40px rgb(0 0 0 / 0.9);
+    overflow: hidden;
+  }
+
+  .win__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid #252b2f;
+    background: rgb(255 255 255 / 0.015);
+  }
+
+  .win__dots {
+    display: flex;
+    gap: 5px;
+  }
+  .win__dots i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #30373b;
+  }
+
+  .win__app {
+    font-size: 0.6875rem;
+    color: var(--color-text);
+    letter-spacing: 0.04em;
+  }
+
+  .win__search {
+    margin-left: auto;
+    width: 30%;
+    max-width: 160px;
+    height: 20px;
+    border: 1px solid #2b3236;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding-inline: 0.5rem;
+  }
+  .win__search span {
+    width: 50%;
+    height: 5px;
+    border-radius: 3px;
+    background: #30373b;
+  }
+
+  /* ---------- App layout ---------- */
+  .app {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .side {
+    display: grid;
+    align-content: start;
+    gap: 0.9rem;
+    padding: 0.9rem 0.6rem;
+    border-right: 1px solid #22292d;
+    background: #0f1316;
+  }
+
+  .side__logo {
+    width: 20px;
+    height: 20px;
+    margin-left: 0.35rem;
+    border-radius: 5px;
+    background: linear-gradient(135deg, var(--tone-teal), #145d6e);
+  }
+
+  .side ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 2px;
+  }
+
+  .side__item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.4rem 0.45rem;
+    border-radius: 6px;
+    font-size: 0.6875rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .side__item--active {
+    background: rgb(31 140 165 / 0.14);
+    color: var(--color-text);
+    box-shadow: inset 2px 0 0 var(--tone-teal);
+  }
+
+  .side__icon {
+    width: 10px;
+    height: 10px;
+    flex: none;
+    border: 1.3px solid currentColor;
+    border-radius: 2px;
+    opacity: 0.85;
+  }
+  .side__icon[data-i="1"] {
+    border-radius: 50%;
+  }
+  .side__icon[data-i="2"] {
+    border-radius: 50% 50% 2px 2px;
+  }
+  .side__icon[data-i="3"] {
+    border-radius: 1px 4px 1px 1px;
+  }
+  .side__icon[data-i="4"] {
+    border-radius: 50% 50% 50% 2px;
+  }
+
+  .main {
+    display: grid;
+    gap: 0.85rem;
+    padding: 0.9rem;
+    min-width: 0;
+  }
+
+  .main__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .main__title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+  }
+
+  .team-stack {
+    display: flex;
+  }
+  .team-stack i {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--c);
+    border: 2px solid #12171a;
+    margin-left: -6px;
+  }
+
+  /* ---------- Project cards ---------- */
+  .projects {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .proj {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.55rem;
+    border: 1px solid #262d31;
+    border-radius: 9px;
+    background: #181e22;
+    min-width: 0;
+  }
+
+  .proj:nth-child(3) {
+    display: none;
+  }
+
+  .proj__thumb {
+    height: 44px;
+    border-radius: 6px;
+    display: grid;
+    place-items: stretch;
+    padding: 6px 8px 0;
+    background: linear-gradient(180deg, #1f262b, #1a2024);
+    color: #4c575d;
+    overflow: hidden;
+  }
+
+  .proj__thumb[data-tone="teal"] {
+    color: var(--tone-teal-text);
+    background: linear-gradient(180deg, rgb(31 140 165 / 0.2), rgb(31 140 165 / 0.05));
+  }
+
+  .proj__thumb svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .proj__name {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .pill {
+    justify-self: start;
+    max-width: 100%;
+    padding: 0.12rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.5625rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pill[data-tone="teal"] {
+    background: rgb(31 140 165 / 0.18);
+    color: var(--tone-teal-text);
+  }
+  .pill[data-tone="light"] {
+    background: rgb(201 206 208 / 0.12);
+    color: var(--tone-light);
+  }
+  .pill[data-tone="red"] {
+    background: rgb(228 0 58 / 0.16);
+    color: var(--tone-red-text);
+  }
+
+  .bar {
+    display: block;
+    height: 3px;
+    border-radius: 2px;
+    background: #2a3135;
+    overflow: hidden;
+  }
+  .bar span {
+    display: block;
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  [data-tone="teal"].sched__bar,
+  .bar span[data-tone="teal"] {
+    background: var(--tone-teal);
+  }
+  [data-tone="light"].sched__bar,
+  .bar span[data-tone="light"] {
+    background: #8e989c;
+  }
+  [data-tone="red"].sched__bar,
+  .bar span[data-tone="red"] {
+    background: var(--tone-red);
+  }
+
+  .proj__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.5625rem;
+    color: var(--color-text-muted);
+  }
+
+  .proj__meta svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  /* ---------- Schedule ---------- */
+  .sched {
+    border: 1px solid #262d31;
+    border-radius: 9px;
+    background: #161b1f;
+    padding: 0.6rem 0.65rem 0.7rem;
+  }
+
+  .sched__head,
+  .sched__row {
+    display: grid;
+    grid-template-columns: 4.4rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sched__title {
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+  }
+
+  .sched__weeks {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    height: 8px;
+  }
+  .sched__weeks i {
+    border-left: 1px solid #2a3135;
+  }
+
+  .sched__rows {
+    position: relative;
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 0.5rem;
+  }
+
+  .sched__name {
+    font-size: 0.625rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sched__track {
+    position: relative;
+    height: 12px;
+    border-radius: 3px;
+    background: repeating-linear-gradient(90deg, #1d2327 0 calc(100% / 12 - 1px), #262d31 calc(100% / 12 - 1px) calc(100% / 12));
+  }
+
+  .sched__bar {
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    border-radius: 2px;
+    opacity: 0.9;
+  }
+
+  /* "Today" marker across the schedule rows */
+  .sched__today {
+    position: absolute;
+    top: -0.3rem;
+    bottom: -0.2rem;
+    left: calc(4.4rem + 0.5rem + (100% - 4.4rem - 0.5rem) * 0.47);
+    width: 1px;
+    background: var(--tone-red);
+  }
+  .sched__today::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--tone-red);
+  }
+
+  /* Narrow: icon-only sidebar */
+  @container (max-width: 419px) {
+    .side__label,
+    .side__logo {
+      display: none;
+    }
+    .side {
+      padding-inline: 0.35rem;
+    }
+  }
+
+  @container (min-width: 520px) {
+    .projects {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .proj:nth-child(3) {
+      display: grid;
+    }
+    .main {
+      padding: 1.1rem;
+      gap: 1rem;
+    }
+    .proj__thumb {
+      height: 54px;
+    }
+  }
+</style>
