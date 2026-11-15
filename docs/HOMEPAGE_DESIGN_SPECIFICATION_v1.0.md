@@ -402,7 +402,7 @@ technologii.
 **Nie zaczynamy od technologii. Zaczynamy od problemu.**
 
 Tekst:
-`Każda firma działa inaczej. Dlatego najpierw poznajemy sposób pracy i szukamy miejsca, w którym można coś uprościć. Dopiero później dobieramy rozwiązanie — takie, które ma sens biznesowy i technologiczny.`
+`Każda firma działa inaczej. Dlatego najpierw poznajemy sposób pracy i szukamy miejsca, w którym można coś uprościć. Dopiero później dobieramy rozwiązanie - takie, które ma sens biznesowy i technologiczny.`
 
 ### Cztery obszary
 
@@ -591,7 +591,7 @@ zmienisz.**
 Nagłówek pomocniczy: **Poznaj ludzi, z którymi będziesz pracować.**
 
 Tekst:
-`Data Wildcat tworzy trzyosobowy zespół z kilkunastoletnim doświadczeniem w branży, szczególnie w przetwarzaniu dużych zbiorów danych i automatyzacji procesów.`
+`Data Wildcat tworzy zespół z kilkunastoletnim doświadczeniem w branży, szczególnie w przetwarzaniu dużych zbiorów danych i automatyzacji procesów.`
 
 Układ: - Trzy portretowe zdjęcia członków zespołu. - Krótkie imię i
 nazwisko oraz zatwierdzony opis kompetencji --- dane do uzupełnienia. -

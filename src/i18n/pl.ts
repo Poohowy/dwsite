@@ -106,7 +106,7 @@ export const pl: Dictionary = {
     eyebrow: "03 / Nasze podejście",
     title: "Najpierw poznajemy Twoją firmę. Potem dobieramy rozwiązanie.",
     intro:
-      "Każda firma działa inaczej. Dlatego najpierw poznajemy sposób pracy i szukamy miejsca, w którym można coś uprościć. Dopiero później dobieramy rozwiązanie — takie, które ma sens biznesowy i technologiczny.",
+      "Każda firma działa inaczej. Dlatego najpierw poznajemy sposób pracy i szukamy miejsca, w którym można coś uprościć. Dopiero później dobieramy rozwiązanie - takie, które ma sens biznesowy i technologiczny.",
     chooseLabel: "Dobieramy rozwiązanie",
     items: [
       { title: "Automatyzacja procesów", text: "Ograniczamy ręczne, powtarzalne zadania i usprawniamy przepływ pracy." },
@@ -190,7 +190,7 @@ export const pl: Dictionary = {
     ],
     teamTitle: "Poznaj ludzi, z którymi będziesz pracować.",
     teamText:
-      "Data Wildcat tworzy trzyosobowy zespół z kilkunastoletnim doświadczeniem w branży, szczególnie w przetwarzaniu dużych zbiorów danych i automatyzacji procesów.",
+      "Data Wildcat tworzy zespół z kilkunastoletnim doświadczeniem w branży, szczególnie w przetwarzaniu dużych zbiorów danych i automatyzacji procesów.",
     placeholderName: "Członek zespołu",
     placeholderNote: "Zdjęcie i opis do uzupełnienia",
   },

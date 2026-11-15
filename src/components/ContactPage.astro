@@ -1,0 +1,566 @@
+---
+/**
+ * Contact page (PL: /kontakt/, EN: /en/contact/).
+ * Page-specific component: reuses global tokens/classes (container, section,
+ * eyebrow, lead, btn, data-reveal) without modifying any shared file.
+ * No contact form by design — email and phone only.
+ */
+import ArrowIcon from "@/components/ArrowIcon.astro";
+import type { Lang } from "@/i18n";
+import { CONTACT, contactCopy } from "@/i18n/contact";
+import Base from "@/layouts/Base.astro";
+import { encodeContact } from "@/scripts/contact-reveal";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = contactCopy(lang);
+
+// Only encoded chunks reach the HTML; the browser assembles the real values.
+const [emailA, emailB] = encodeContact(CONTACT.email);
+const [phoneA, phoneB] = encodeContact(CONTACT.phoneDisplay);
+const emailData = { "data-contact": "email", "data-ca": emailA, "data-cb": emailB };
+const phoneData = { "data-contact": "phone", "data-ca": phoneA, "data-cb": phoneB };
+---
+
+<Base lang={lang} page="contact" title={c.meta.title} description={c.meta.description}>
+  <!-- A. Introduction + B. Contact details + C. Location -->
+  <section class="ct-hero" aria-labelledby="contact-title">
+    <div class="ct-hero__bg" aria-hidden="true"></div>
+    <div class="container ct-hero__inner">
+      <div class="ct-intro">
+        <p class="eyebrow ct-in" style="--i:0">{c.eyebrow}</p>
+        <h1 class="ct-title ct-in" id="contact-title" style="--i:1">
+          <span>{c.titleQuestion}</span>
+          <span class="ct-title__invite">{c.titleInvite}<span class="accent">.</span></span>
+        </h1>
+        <p class="lead ct-lead ct-in" style="--i:2">{c.lead}</p>
+        <p class="ct-free ct-in" style="--i:3">
+          <span class="ct-free__dot" aria-hidden="true"></span>
+          {c.free}
+        </p>
+      </div>
+
+      <div class="ct-card ct-in" style="--i:2" role="group" aria-label={c.detailsLabel}>
+        <!-- Email -->
+        <div class="ct-method" {...emailData}>
+          <a class="ct-method__link" data-contact-link>
+            <span class="ct-method__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="5" width="18" height="14" rx="1.5"></rect>
+                <path d="m3.5 6 8.5 7 8.5-7"></path>
+              </svg>
+            </span>
+            <span class="ct-method__body">
+              <span class="ct-method__label mono">{c.email.label}</span>
+              <span class="ct-method__value" data-contact-value><span class="ct-fallback">{c.noscript.email}</span></span>
+              <span class="ct-method__action">{c.email.action} <ArrowIcon /></span>
+            </span>
+          </a>
+          <button
+            type="button"
+            class="ct-copy mono"
+            data-copy=""
+            data-label-done={c.copy.done}
+            aria-label={c.copy.emailAria}
+          >
+            <span data-copy-text>{c.copy.idle}</span>
+          </button>
+        </div>
+
+        <!-- Phone -->
+        <div class="ct-method" {...phoneData}>
+          <a class="ct-method__link" data-contact-link>
+            <span class="ct-method__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path
+                  d="M5 3.5h3.2l1.6 4.2-2.1 1.4a11 11 0 0 0 7.2 7.2l1.4-2.1 4.2 1.6V19a1.5 1.5 0 0 1-1.6 1.5C10.6 20 4 13.4 3.5 5.1A1.5 1.5 0 0 1 5 3.5Z"
+                ></path>
+              </svg>
+            </span>
+            <span class="ct-method__body">
+              <span class="ct-method__label mono">{c.phone.label}</span>
+              <span class="ct-method__value" data-contact-value><span class="ct-fallback">{c.noscript.phone}</span></span>
+              <span class="ct-method__action">{c.phone.action} <ArrowIcon /></span>
+            </span>
+          </a>
+          <button
+            type="button"
+            class="ct-copy mono"
+            data-copy=""
+            data-label-done={c.copy.done}
+            aria-label={c.copy.phoneAria}
+          >
+            <span data-copy-text>{c.copy.idle}</span>
+          </button>
+        </div>
+
+        <!-- Location (understated) -->
+        <p class="ct-location">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M12 21s-6.5-6.1-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.9 12 21 12 21Z"></path>
+            <circle cx="12" cy="9.8" r="2.3"></circle>
+          </svg>
+          <span class="visually-hidden">{c.location.label}: </span>
+          {c.location.value}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- D. What happens next? -->
+  <section class="section section--surface ct-next" aria-labelledby="contact-next-title">
+    <div class="container">
+      <header class="ct-next__head">
+        <p class="eyebrow" data-reveal="fade">{c.next.eyebrow}</p>
+        <h2 class="h2" id="contact-next-title" data-reveal>{c.next.title}</h2>
+      </header>
+      <ol role="list" class="ct-steps">
+        {
+          c.next.steps.map((s, i) => (
+            <li class="ct-step" data-reveal>
+              <span class="ct-step__num mono">{String(i + 1).padStart(2, "0")}</span>
+              <h3 class="h3">{s.title}</h3>
+              <p class="ct-step__text">{s.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- E. Small closing CTA (direct contact only) -->
+  <section class="ct-closing" aria-labelledby="contact-closing-title">
+    <div class="container ct-closing__inner" data-reveal>
+      <div>
+        <h2 class="ct-closing__title" id="contact-closing-title">{c.closing.title}</h2>
+        <p class="ct-closing__text">{c.closing.text}</p>
+      </div>
+      <div class="ct-closing__actions">
+        <a class="btn btn--primary btn--block-mobile" data-contact-link {...emailData}>{c.closing.email} <ArrowIcon /></a>
+        <a class="btn btn--ghost btn--block-mobile" data-contact-link {...phoneData}>{c.closing.phone}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- A–C: intro + contact card ---------- */
+  .ct-hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding-block: clamp(3.5rem, 2rem + 6vw, 7.5rem) clamp(4rem, 3rem + 5vw, 7.5rem);
+  }
+
+  /* Static background in the hero's language: faint grid + soft brand lights */
+  .ct-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 45% 55% at 85% 15%, rgb(31 140 165 / 0.12), transparent 70%),
+      radial-gradient(ellipse 30% 40% at 95% 90%, rgb(228 0 58 / 0.05), transparent 70%),
+      linear-gradient(to right, rgb(255 255 255 / 0.03) 1px, transparent 1px) 0 0 / 104px 104px,
+      linear-gradient(to bottom, rgb(255 255 255 / 0.03) 1px, transparent 1px) 0 0 / 104px 104px;
+    mask-image: radial-gradient(ellipse 85% 80% at 70% 30%, #000 25%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 85% 80% at 70% 30%, #000 25%, transparent 80%);
+  }
+
+  .ct-hero__inner {
+    display: grid;
+    gap: clamp(2.5rem, 1.5rem + 4vw, 4.5rem);
+  }
+
+  .ct-intro {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+
+  .ct-title {
+    font-size: clamp(2.3rem, 1.4rem + 3.8vw, 4.75rem);
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 1;
+    max-width: 16ch;
+    text-wrap: balance;
+  }
+
+  .ct-title > span {
+    display: block;
+  }
+
+  .ct-title__invite {
+    margin-top: 0.1em;
+    color: var(--color-text-muted);
+  }
+
+  .ct-lead {
+    max-width: 52ch;
+  }
+
+  .ct-free {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    justify-self: start;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .ct-free__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-brand-teal);
+    box-shadow: 0 0 0 3px rgb(31 140 165 / 0.2);
+  }
+
+  .ct-in {
+    animation: ct-in 800ms var(--ease-reveal) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 60ms);
+  }
+
+  @keyframes ct-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+
+  /* Contact card */
+  .ct-card {
+    position: relative;
+    align-self: start;
+    display: grid;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, var(--color-surface), rgb(18 22 25 / 0.85));
+    box-shadow: 0 30px 80px -40px rgb(0 0 0 / 0.8);
+    overflow: hidden;
+  }
+
+  .ct-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(79 179 203 / 0.55), transparent);
+  }
+
+  .ct-method {
+    position: relative;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .ct-method__link {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 1.1rem;
+    align-items: start;
+    padding: clamp(1.25rem, 1rem + 1.2vw, 2rem);
+    padding-right: 5.5rem; /* room for the copy button */
+    transition: background-color var(--dur) var(--ease-out);
+  }
+
+  .ct-method__link:hover {
+    background: rgb(255 255 255 / 0.025);
+  }
+
+  .ct-method__link:focus-visible {
+    outline-offset: -3px;
+  }
+
+  .ct-method__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-teal-text);
+    transition:
+      border-color var(--dur) var(--ease-out),
+      color var(--dur) var(--ease-out);
+  }
+
+  .ct-method__icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .ct-method__link:hover .ct-method__icon {
+    border-color: var(--color-brand-teal);
+  }
+
+  .ct-method__body {
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .ct-method__label {
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .ct-method__value {
+    font-size: clamp(1.3rem, 1rem + 1.4vw, 1.9rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    color: var(--color-text);
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ct-method__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.25rem;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    transition: color var(--dur) var(--ease-out);
+  }
+
+  .ct-method__action :global(svg) {
+    width: 0.9em;
+    height: 0.9em;
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .ct-method__link:hover .ct-method__action {
+    color: var(--color-teal-text);
+  }
+
+  .ct-method__link:hover .ct-method__action :global(svg) {
+    transform: translateX(3px);
+  }
+
+  .ct-copy {
+    position: absolute;
+    top: clamp(1.25rem, 1rem + 1.2vw, 2rem);
+    right: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+    min-width: 64px;
+    min-height: 32px;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition:
+      color var(--dur) var(--ease-out),
+      border-color var(--dur) var(--ease-out);
+  }
+
+  .ct-copy:hover {
+    color: var(--color-text);
+    border-color: var(--color-text-muted);
+  }
+
+  .ct-copy[data-copied] {
+    color: var(--color-teal-text);
+    border-color: var(--color-brand-teal);
+  }
+
+  /* The copy button needs JS — hide it when JS is unavailable */
+  :global(html:not(.js)) .ct-copy {
+    display: none;
+  }
+
+  /* Details are assembled by JS: keep the slot invisible until filled (no flash),
+     and show a short, smaller notice when JS is unavailable. */
+  :global(html.js) .ct-method__value:not([data-ready]) {
+    min-height: 1.15em; /* reserve the line the value will occupy */
+  }
+
+  :global(html.js) .ct-fallback {
+    display: none;
+  }
+
+  .ct-fallback {
+    display: block;
+    font-size: var(--text-base);
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--color-text-muted);
+  }
+
+  :global(html:not(.js)) .ct-method__action,
+  :global(html:not(.js)) .ct-closing__actions {
+    display: none;
+  }
+
+  .ct-location {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.1rem clamp(1.25rem, 1rem + 1.2vw, 2rem);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .ct-location svg {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 1024px) {
+    .ct-hero__inner {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      align-items: center;
+    }
+    /* Desktop only: lower the card so it sits closer to the headline block */
+    .ct-card {
+      margin-top: 2.75rem;
+    }
+  }
+
+  /* ---------- D: next steps ---------- */
+  .ct-next__head {
+    display: grid;
+    gap: 1.25rem;
+    margin-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+
+  .ct-steps {
+    display: grid;
+    gap: 1rem;
+    counter-reset: step;
+  }
+
+  .ct-step {
+    position: relative;
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    padding: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+  }
+
+  .ct-step__num {
+    font-size: var(--text-xs);
+    color: var(--color-brand-red);
+    margin-bottom: 0.75rem;
+  }
+
+  .ct-step__text {
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+  }
+
+  @media (min-width: 800px) {
+    .ct-steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+    /* Arrow connectors between the steps */
+    .ct-step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: calc(-1.25rem + 1px);
+      width: calc(1.25rem - 2px);
+      height: 1px;
+      background: var(--color-brand-red);
+    }
+  }
+
+  /* ---------- E: closing ---------- */
+  .ct-closing {
+    padding-block: clamp(3.5rem, 2.5rem + 4vw, 6rem);
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .ct-closing__inner {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  .ct-closing__title {
+    font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.4rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+  }
+
+  .ct-closing__text {
+    margin-top: 0.6rem;
+    color: var(--color-text-muted);
+    max-width: 48ch;
+  }
+
+  .ct-closing__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 900px) {
+    .ct-closing__inner {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 3rem;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .ct-method__link {
+      grid-template-columns: 40px minmax(0, 1fr);
+      gap: 0.9rem;
+      padding-right: 1.25rem;
+    }
+    .ct-method__icon {
+      width: 40px;
+      height: 40px;
+    }
+    /* On small phones the copy button sits under the details instead of overlapping them */
+    .ct-copy {
+      position: static;
+      margin: -0.5rem 0 1.1rem calc(1.25rem + 40px + 0.9rem);
+    }
+  }
+</style>
+
+<script>
+  import { revealContacts } from "@/scripts/contact-reveal";
+  revealContacts();
+
+  document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((btn) => {
+    const text = btn.querySelector<HTMLElement>("[data-copy-text]");
+    const idle = text?.textContent ?? "";
+    let timer = 0;
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy ?? "");
+        if (text) text.textContent = btn.dataset.labelDone ?? idle;
+        btn.setAttribute("data-copied", "");
+        window.clearTimeout(timer);
+        timer = window.setTimeout(() => {
+          if (text) text.textContent = idle;
+          btn.removeAttribute("data-copied");
+        }, 2000);
+      } catch {
+        // Clipboard unavailable (e.g. insecure context) — the details remain selectable text.
+      }
+    });
+  });
+</script>
