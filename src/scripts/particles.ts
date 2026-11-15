@@ -1,5 +1,5 @@
 /**
- * Hero particle field — lightweight Canvas 2D, no dependencies.
+ * Hero particle field - lightweight Canvas 2D, no dependencies.
  *
  * - A grid of small square dots with per-dot depth (size, opacity, parallax).
  * - Fine pointers: a smoothed cursor leaves a short trail; nearby dots brighten

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Data Wildcat — design tokens & base styles
+   Data Wildcat - design tokens & base styles
    Token values start from HOMEPAGE_DESIGN_SPECIFICATION_v1.0 §3.3.
    ========================================================================== */
 
@@ -320,7 +320,7 @@ button {
 
 /* ---------- Section surfaces & transitions ---------- */
 
-/* Light sections become inset panels with rounded corners — a distinctive
+/* Light sections become inset panels with rounded corners - a distinctive
    transition between dark and light without hard full-bleed edges. */
 .section.light {
   margin-inline: clamp(0.5rem, 0.2rem + 1vw, 1rem);
@@ -408,7 +408,7 @@ button {
     transform var(--dur) var(--ease-out);
 }
 
-/* Slight lift on hover, gentle press on click (transform only — no layout shift) */
+/* Slight lift on hover, gentle press on click (transform only - no layout shift) */
 .btn:hover {
   transform: translateY(-1px);
 }

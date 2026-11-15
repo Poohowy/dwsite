@@ -58,7 +58,7 @@ export interface ArchiFlowCopy {
 
 const pl: ArchiFlowCopy = {
   meta: {
-    title: "ArchiFlow — zarządzanie projektami dla biur architektonicznych | Data Wildcat",
+    title: "ArchiFlow - zarządzanie projektami dla biur architektonicznych | Data Wildcat",
     description:
       "ArchiFlow porządkuje projekty, harmonogramy, zespół i informacje o klientach biura architektonicznego w jednym miejscu.",
   },
@@ -192,14 +192,14 @@ const pl: ArchiFlowCopy = {
 
 const en: ArchiFlowCopy = {
   meta: {
-    title: "ArchiFlow — project management for architecture practices | Data Wildcat",
+    title: "ArchiFlow - project management for architecture practices | Data Wildcat",
     description:
       "ArchiFlow brings an architecture practice's projects, schedules, team and client information together in one place.",
   },
   hero: {
     eyebrow: "Project management for architecture practices",
     title: "Every project in your practice. All in one place.",
-    lead: "ArchiFlow helps you organise projects, schedules, your team and client information. Get a clearer picture of what's happening across your practice — without searching through multiple tools and files.",
+    lead: "ArchiFlow helps you organise projects, schedules, your team and client information. Get a clearer picture of what's happening across your practice - without searching through multiple tools and files.",
     secondary: "Explore the features",
     shotAlt:
       "ArchiFlow Dashboard: number of active projects, projects needing attention, upcoming deadlines, team workload and recently updated projects.",

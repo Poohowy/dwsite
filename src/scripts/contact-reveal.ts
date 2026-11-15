@@ -4,7 +4,7 @@
  * The static HTML carries contact details only in an encoded form
  * (base64 of the reversed string, split into two chunks), so the full email
  * address / phone number and mailto:/tel: links do not appear in the source.
- * They are assembled here at runtime. This deters basic scrapers only — any bot
+ * They are assembled here at runtime. This deters basic scrapers only - any bot
  * that executes JavaScript can still read the result.
  */
 

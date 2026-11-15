@@ -36,14 +36,14 @@ export interface ContactCopy {
 
 const pl: ContactCopy = {
   meta: {
-    title: "Kontakt — Data Wildcat",
+    title: "Kontakt - Data Wildcat",
     description:
       "Napisz lub zadzwoń i opowiedz, co chcesz usprawnić w swojej firmie. Pierwsza konsultacja jest bezpłatna.",
   },
   eyebrow: "Kontakt",
   titleQuestion: "Masz pomysł na usprawnienie swojej firmy?",
   titleInvite: "Porozmawiajmy",
-  lead: "Opowiedz nam, co zajmuje czas Twojego zespołu lub utrudnia codzienną pracę. Nie musisz znać rozwiązania — wystarczy, że opiszesz problem. Wspólnie zastanowimy się, co można z tym zrobić.",
+  lead: "Opowiedz nam, co zajmuje czas Twojego zespołu lub utrudnia codzienną pracę. Nie musisz znać rozwiązania - wystarczy, że opiszesz problem. Wspólnie zastanowimy się, co można z tym zrobić.",
   free: "Pierwsza konsultacja jest bezpłatna",
   detailsLabel: "Dane kontaktowe",
   email: { label: "Napisz do nas", action: "Wyślij wiadomość" },
@@ -73,14 +73,14 @@ const pl: ContactCopy = {
 
 const en: ContactCopy = {
   meta: {
-    title: "Contact — Data Wildcat",
+    title: "Contact - Data Wildcat",
     description:
       "Write or call and tell us what you'd like to improve in your business. The first consultation is free.",
   },
   eyebrow: "Contact",
   titleQuestion: "Have an idea for improving your business?",
   titleInvite: "Let's talk",
-  lead: "Tell us what takes up your team's time or makes everyday work harder. You don't need to know the solution — just describe the problem. We'll work out together what can be done about it.",
+  lead: "Tell us what takes up your team's time or makes everyday work harder. You don't need to know the solution - just describe the problem. We'll work out together what can be done about it.",
   free: "The first consultation is free",
   detailsLabel: "Contact details",
   email: { label: "Write to us", action: "Send an email" },

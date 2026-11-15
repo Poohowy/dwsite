@@ -3,9 +3,9 @@ import type { Dictionary } from "./types";
 // Source: docs/HOMEPAGE_DESIGN_SPECIFICATION_v1.0.md (draft copy, section 6).
 export const pl: Dictionary = {
   meta: {
-    title: "Data Wildcat — Ty przychodzisz z problemem. My znajdujemy rozwiązanie.",
+    title: "Data Wildcat - Ty przychodzisz z problemem. My znajdujemy rozwiązanie.",
     description:
-      "Pomagamy małym i średnim firmom usprawniać procesy, ograniczać powtarzalną pracę i dobierać technologię do realnych potrzeb — od automatyzacji i integracji po dedykowane aplikacje i AI.",
+      "Pomagamy małym i średnim firmom usprawniać procesy, ograniczać powtarzalną pracę i dobierać technologię do realnych potrzeb - od automatyzacji i integracji po dedykowane aplikacje i AI.",
   },
   routes: { home: "/", contact: "/kontakt/", pricer: "/pricer/", archiflow: "/archiflow/" },
   nav: {
@@ -20,7 +20,7 @@ export const pl: Dictionary = {
     menuOpen: "Otwórz menu",
     menuClose: "Zamknij menu",
     langLabel: "Wybór języka",
-    homeLabel: "Data Wildcat — strona główna",
+    homeLabel: "Data Wildcat - strona główna",
   },
   cta: { primary: "Umów bezpłatną konsultację" },
   hero: {

@@ -1,5 +1,5 @@
 /**
- * Pricer demo — frontend-only visual simulation.
+ * Pricer demo - frontend-only visual simulation.
  * No network requests, no AI calls: it only switches between pre-rendered
  * scenario panes and plays a short sequence of illustrative states.
  *

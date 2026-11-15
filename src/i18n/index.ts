@@ -22,7 +22,7 @@ export function approachAnchor(lang: Lang): string {
 
 export type PageKey = keyof Dictionary["routes"];
 
-/** Path of the same page in the other language — used by the PL/EN switcher and hreflang. */
+/** Path of the same page in the other language - used by the PL/EN switcher and hreflang. */
 export function alternates(page: PageKey): Record<Lang, string> {
   return { pl: pl.routes[page], en: en.routes[page] };
 }

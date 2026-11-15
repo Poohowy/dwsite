@@ -6,7 +6,7 @@
  *   cost / month  = cost / week × 52 / 12
  *   cost / year   = cost / week × 52
  *
- * This is the cost of time spent on repetitive work — not a promised saving.
+ * This is the cost of time spent on repetitive work - not a promised saving.
  */
 export const WEEKS_PER_YEAR = 52;
 export const MONTHS_PER_YEAR = 12;

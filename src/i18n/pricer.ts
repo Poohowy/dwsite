@@ -1,7 +1,7 @@
 import type { Lang } from "./types";
 
 /**
- * Pricer landing page — copy and demo scenario data.
+ * Pricer landing page - copy and demo scenario data.
  * Source of truth: docs/PRICER_PRODUCT_LANDING_PAGE_SPECIFICATION_v1.0.md
  *
  * Only capabilities confirmed in the specification are described here. In
@@ -10,7 +10,7 @@ import type { Lang } from "./types";
  */
 
 /* ------------------------------------------------------------------ */
-/* Demo scenarios — add new scenarios by appending to `scenarios`.     */
+/* Demo scenarios - add new scenarios by appending to `scenarios`.     */
 /* ------------------------------------------------------------------ */
 
 export interface DemoPricing {
@@ -38,7 +38,7 @@ export interface DemoScenario {
     items: string[];
     /** Grounded unit pricing (standard scenario). */
     pricing?: DemoPricing;
-    /** Budget constraint (budget scenario) — no invented composition or totals. */
+    /** Budget constraint (budget scenario) - no invented composition or totals. */
     budget?: { limitNet: number; suggestionsTitle: string; suggestions: string[]; reviewNote: string };
     note: string;
   };
@@ -97,14 +97,14 @@ const EXAMPLE_PRICING: DemoPricing = { net: 89.0, vat: 20.47, gross: 109.47, dis
 
 const pl: PricerCopy = {
   meta: {
-    title: "Pricer — system wycen i ofertowania | Data Wildcat",
+    title: "Pricer - system wycen i ofertowania | Data Wildcat",
     description:
       "Pricer zamienia zapytania klientów w uporządkowane wyceny i gotowe oferty na podstawie katalogu produktów, reguł cenowych i szablonów Twojej firmy.",
   },
   hero: {
     eyebrow: "System wycen i ofertowania",
     title: "Od wiadomości klienta do gotowej oferty.",
-    lead: "Pricer porządkuje proces przygotowania wycen — od pierwszego zapytania, przez automatyczne obliczenia i rabaty, aż po gotową ofertę. Wszystko na podstawie danych i reguł Twojej firmy.",
+    lead: "Pricer porządkuje proces przygotowania wycen - od pierwszego zapytania, przez automatyczne obliczenia i rabaty, aż po gotową ofertę. Wszystko na podstawie danych i reguł Twojej firmy.",
     secondary: "Zobacz, jak działa Pricer",
     flow: {
       label: "Schemat: wiadomość klienta, dane produktów i cen, wycena, gotowa oferta",
@@ -160,7 +160,7 @@ const pl: PricerCopy = {
     eyebrow: "Prezentacja",
     title: "Sprawdź, jak Pricer zamienia wiadomość w ofertę.",
     lead: "Wybierz przykładowe zapytanie i zobacz, jak może wyglądać wynik procesu.",
-    notice: "Przykładowa prezentacja działania — dane i wynik demonstracyjne.",
+    notice: "Przykładowa prezentacja działania - dane i wynik demonstracyjne.",
     selectorLabel: "Wybierz scenariusz",
     emailLabel: "Wiadomość od klienta",
     toLabel: "Do",
@@ -240,7 +240,7 @@ const pl: PricerCopy = {
             suggestionsTitle: "Propozycje uzupełnienia",
             suggestions: [
               "Pricer może zaproponować dodatkowe produkty z katalogu tak, aby kosz mieścił się w limicie.",
-              "Każda propozycja jest wersją roboczą — możesz usunąć pozycję i otrzymać inną, wciąż mieszczącą się w budżecie.",
+              "Każda propozycja jest wersją roboczą - możesz usunąć pozycję i otrzymać inną, wciąż mieszczącą się w budżecie.",
             ],
             reviewNote: "Ofertę akceptujesz dopiero po sprawdzeniu propozycji.",
           },
@@ -285,14 +285,14 @@ const pl: PricerCopy = {
 
 const en: PricerCopy = {
   meta: {
-    title: "Pricer — quotation and offer system | Data Wildcat",
+    title: "Pricer - quotation and offer system | Data Wildcat",
     description:
       "Pricer turns customer enquiries into structured quotes and ready-to-send offers, based on your product catalogue, pricing rules and templates.",
   },
   hero: {
     eyebrow: "Quotation and offer system",
     title: "From a customer's message to a ready offer.",
-    lead: "Pricer brings order to the way quotes are prepared — from the first enquiry, through automatic calculations and discounts, to a finished offer. All based on your company's own data and rules.",
+    lead: "Pricer brings order to the way quotes are prepared - from the first enquiry, through automatic calculations and discounts, to a finished offer. All based on your company's own data and rules.",
     secondary: "See how Pricer works",
     flow: {
       label: "Diagram: customer message, product and pricing data, quote, ready offer",
@@ -348,7 +348,7 @@ const en: PricerCopy = {
     eyebrow: "Demo",
     title: "See how Pricer turns a message into an offer.",
     lead: "Choose a sample enquiry and see what the result of the process can look like.",
-    notice: "Illustrative demo — sample data and sample result.",
+    notice: "Illustrative demo - sample data and sample result.",
     selectorLabel: "Choose a scenario",
     emailLabel: "Message from the customer",
     toLabel: "To",
@@ -377,11 +377,11 @@ const en: PricerCopy = {
     scenarios: [
       {
         id: "standard",
-        label: "Gift baskets — standard enquiry",
+        label: "Gift baskets - standard enquiry",
         hint: "Five baskets with specified contents",
         email: {
           from: "Jan Kowalski",
-          subject: "Request for a quote — gift baskets",
+          subject: "Request for a quote - gift baskets",
           body: "Hello,\n\nWe need five gift baskets for a conference. Each with tea, an energy bar, crackers and honey. Please send us an offer.\n\nBest regards\nJan Kowalski",
         },
         detected: [
@@ -390,7 +390,7 @@ const en: PricerCopy = {
           { label: "Contents", value: "tea, energy bar, crackers, honey" },
         ],
         offer: {
-          title: "Offer — gift baskets",
+          title: "Offer - gift baskets",
           customer: "Jan Kowalski",
           quantity: "5 baskets",
           items: ["Tea", "Energy bar", "Crackers", "Honey"],
@@ -400,11 +400,11 @@ const en: PricerCopy = {
       },
       {
         id: "budget",
-        label: "Gift baskets — with a budget limit",
+        label: "Gift baskets - with a budget limit",
         hint: "Same contents, max. PLN 90 net per basket",
         email: {
           from: "Jan Kowalski",
-          subject: "Request for a quote — gift baskets (budget)",
+          subject: "Request for a quote - gift baskets (budget)",
           body: "Hello,\n\nWe need five gift baskets for a conference. Each with tea, an energy bar, crackers and honey. The maximum price per basket is PLN 90 net. Please send us an offer.\n\nBest regards,\nJan Kowalski",
         },
         detected: [
@@ -414,7 +414,7 @@ const en: PricerCopy = {
           { label: "Budget", value: "max. PLN 90 net / basket", highlight: true },
         ],
         offer: {
-          title: "Offer — gift baskets",
+          title: "Offer - gift baskets",
           customer: "Jan Kowalski",
           quantity: "5 baskets",
           items: ["Tea", "Energy bar", "Crackers", "Honey"],
@@ -423,7 +423,7 @@ const en: PricerCopy = {
             suggestionsTitle: "Suggested additions",
             suggestions: [
               "Pricer can suggest additional products from the catalogue so that the basket stays within the limit.",
-              "Every suggestion is a draft — you can remove an item and get another one that still fits the budget.",
+              "Every suggestion is a draft - you can remove an item and get another one that still fits the budget.",
             ],
             reviewNote: "You approve the offer only after reviewing the proposal.",
           },

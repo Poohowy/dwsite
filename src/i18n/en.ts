@@ -1,12 +1,12 @@
 import type { Dictionary } from "./types";
 
-// DRAFT English copy — translated from the Polish draft in
+// DRAFT English copy - translated from the Polish draft in
 // docs/HOMEPAGE_DESIGN_SPECIFICATION_v1.0.md. Final EN copywriting is still open (P2).
 export const en: Dictionary = {
   meta: {
-    title: "Data Wildcat — You bring the problem. We find the solution.",
+    title: "Data Wildcat - You bring the problem. We find the solution.",
     description:
-      "We help small and medium-sized businesses improve processes, reduce repetitive work and choose technology that fits real needs — from automation and integrations to custom applications and AI.",
+      "We help small and medium-sized businesses improve processes, reduce repetitive work and choose technology that fits real needs - from automation and integrations to custom applications and AI.",
   },
   routes: { home: "/en/", contact: "/en/contact/", pricer: "/en/pricer/", archiflow: "/en/archiflow/" },
   nav: {
@@ -21,14 +21,14 @@ export const en: Dictionary = {
     menuOpen: "Open menu",
     menuClose: "Close menu",
     langLabel: "Choose language",
-    homeLabel: "Data Wildcat — home",
+    homeLabel: "Data Wildcat - home",
   },
   cta: { primary: "Book a free consultation" },
   hero: {
     eyebrow: "Data Wildcat / Technology partner",
     titleLine1: "You bring the problem.",
     titleLine2: "We find the solution.",
-    lead: "We help businesses improve processes, reduce repetitive work and make better use of technology. We match the solution to real needs — from automation and integrations to custom applications and AI.",
+    lead: "We help businesses improve processes, reduce repetitive work and make better use of technology. We match the solution to real needs - from automation and integrations to custom applications and AI.",
     secondary: "See how we work",
     diagram: {
       label: "Diagram: from a problem to a well-matched solution",
@@ -107,7 +107,7 @@ export const en: Dictionary = {
     eyebrow: "03 / Our approach",
     title: "First, we get to know your business. Then we find the right solution.",
     intro:
-      "Every company works differently. That's why we first learn how you work and look for the place where something can be simplified. Only then do we choose a solution — one that makes sense both for the business and technically.",
+      "Every company works differently. That's why we first learn how you work and look for the place where something can be simplified. Only then do we choose a solution - one that makes sense both for the business and technically.",
     chooseLabel: "Choosing the solution",
     items: [
       { title: "Process automation", text: "We reduce manual, repetitive tasks and streamline the flow of work." },
