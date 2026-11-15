@@ -1,0 +1,93 @@
+---
+import Icon from "@/components/Icon.astro";
+import SectionHead from "@/components/SectionHead.astro";
+import { t, type Lang } from "@/i18n";
+import type { IconName } from "@/lib/icons";
+
+interface Props {
+  lang: Lang;
+}
+const d = t(Astro.props.lang).capabilities;
+const icons: IconName[] = ["cloud", "server", "flow", "blocks"];
+---
+
+<section class="section light capabilities" aria-labelledby="capabilities-title">
+  <div class="container">
+    <SectionHead id="capabilities-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} split />
+
+    <ul role="list" class="cap__grid">
+      {
+        d.items.map((item, i) => (
+          <li class="cap" data-reveal style={`--reveal-delay:${i * 60}ms`}>
+            <Icon name={icons[i]} class="cap__icon" />
+            <div class="cap__body">
+              <h3 class="h3">{item.title}</h3>
+              <p class="muted">{item.text}</p>
+              {item.tags && (
+                <ul role="list" class="cap__tags">
+                  {item.tags.map((tag) => (
+                    <li class="mono">{tag}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .cap__grid {
+    display: grid;
+    border-top: 1px solid var(--color-light-border);
+  }
+
+  .cap {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 1.25rem;
+    padding-block: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
+    border-bottom: 1px solid var(--color-light-border);
+  }
+
+  .cap :global(.cap__icon) {
+    width: 32px;
+    height: 32px;
+    color: var(--color-brand-teal);
+  }
+
+  .cap__body {
+    display: grid;
+    gap: 0.6rem;
+    max-width: 48ch;
+  }
+
+  .cap__body p {
+    font-size: 0.9375rem;
+  }
+
+  .cap__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.4rem;
+  }
+
+  .cap__tags li {
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    padding: 0.25rem 0.55rem;
+    border: 1px solid var(--color-light-border);
+    border-radius: 3px;
+    color: var(--color-light-muted);
+  }
+
+  @media (min-width: 800px) {
+    .cap__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: clamp(2rem, 1rem + 4vw, 5rem);
+    }
+  }
+</style>

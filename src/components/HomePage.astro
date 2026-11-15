@@ -1,0 +1,33 @@
+---
+import Calculator from "@/components/Calculator.astro";
+import Capabilities from "@/components/Capabilities.astro";
+import Faq from "@/components/Faq.astro";
+import FinalCta from "@/components/FinalCta.astro";
+import Hero from "@/components/Hero.astro";
+import Problems from "@/components/Problems.astro";
+import Process from "@/components/Process.astro";
+import Products from "@/components/Products.astro";
+import Solutions from "@/components/Solutions.astro";
+import Team from "@/components/Team.astro";
+import type { Lang } from "@/i18n";
+import Base from "@/layouts/Base.astro";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<!-- Section order: HOMEPAGE_ARCHITECTURE_v1.1 §3 -->
+<Base lang={lang} page="home">
+  <Hero lang={lang} />
+  <Problems lang={lang} />
+  <Calculator lang={lang} />
+  <Solutions lang={lang} />
+  <Products lang={lang} />
+  <Process lang={lang} />
+  <Capabilities lang={lang} />
+  <Team lang={lang} />
+  <Faq lang={lang} />
+  <FinalCta lang={lang} />
+</Base>

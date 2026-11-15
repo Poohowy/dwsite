@@ -1,0 +1,117 @@
+---
+import Icon from "@/components/Icon.astro";
+import type { IconName } from "@/lib/icons";
+import SectionHead from "@/components/SectionHead.astro";
+import { t, type Lang } from "@/i18n";
+
+interface Props {
+  lang: Lang;
+}
+const d = t(Astro.props.lang).solutions;
+const icons: IconName[] = ["automation", "ai", "app", "integration"];
+---
+
+<section class="section light solutions" aria-labelledby="solutions-title">
+  <div class="container">
+    <SectionHead id="solutions-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} split />
+
+    <ul role="list" class="solutions__grid">
+      {
+        d.items.map((item, i) => (
+          <li class="solution" data-reveal style={`--reveal-delay:${i * 60}ms`}>
+            <div class="solution__top">
+              <Icon name={icons[i]} class="solution__icon" />
+              <span class="mono solution__num">{String(i + 1).padStart(2, "0")}</span>
+            </div>
+            <h3 class="h3">{item.title}</h3>
+            <p class="muted">{item.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="statement" data-reveal>
+      <span class="statement__mark" aria-hidden="true"></span>
+      {d.statement}
+    </p>
+  </div>
+</section>
+
+<style>
+  .solutions__grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .solution {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    background: var(--color-light-surface);
+    border: 1px solid var(--color-light-border);
+    border-radius: var(--radius);
+    transition: border-color var(--dur) var(--ease-out);
+  }
+
+  .solution:hover {
+    border-color: var(--color-light-muted);
+  }
+
+  .solution__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+  }
+
+  .solution :global(.solution__icon) {
+    width: 32px;
+    height: 32px;
+    color: var(--color-brand-teal);
+  }
+
+  .solution__num {
+    font-size: var(--text-xs);
+    color: var(--color-light-muted);
+  }
+
+  .solution p {
+    font-size: 0.9375rem;
+  }
+
+  .statement {
+    display: flex;
+    gap: 1.25rem;
+    align-items: baseline;
+    margin-top: clamp(3.5rem, 2.5rem + 4vw, 6rem);
+    padding-top: clamp(2rem, 1.5rem + 2vw, 3rem);
+    border-top: 1px solid var(--color-light-border);
+    font-size: clamp(1.6rem, 1.1rem + 2.2vw, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    max-width: 26ch;
+    text-wrap: balance;
+  }
+
+  .statement__mark {
+    flex: none;
+    width: 0.4em;
+    height: 0.4em;
+    background: var(--color-brand-red);
+    transform: translateY(-0.05em);
+  }
+
+  @media (min-width: 640px) {
+    .solutions__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .solutions__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>

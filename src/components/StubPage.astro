@@ -1,0 +1,44 @@
+---
+/**
+ * Temporary placeholder for pages that are specified separately
+ * (Pricer, ArchiFlow, Kontakt). Keeps homepage links from 404-ing. noindex.
+ */
+import ArrowIcon from "@/components/ArrowIcon.astro";
+import { t, type Lang, type PageKey } from "@/i18n";
+import Base from "@/layouts/Base.astro";
+
+interface Props {
+  lang: Lang;
+  page: Exclude<PageKey, "home">;
+  heading: string;
+}
+const { lang, page, heading } = Astro.props;
+const d = t(lang);
+---
+
+<Base lang={lang} page={page} title={`${heading} — Data Wildcat`} noindex>
+  <section class="section stub">
+    <div class="container stub__inner">
+      <span class="badge">{d.stub.badge}</span>
+      <h1 class="h1">{heading}</h1>
+      <p class="lead">{d.stub.text}</p>
+      <a href={d.routes.home} class="btn btn--ghost">{d.stub.back} <ArrowIcon /></a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .stub {
+    min-height: calc(100vh - var(--header-h) - 220px);
+    display: grid;
+    align-items: center;
+  }
+  .stub__inner {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+  }
+  .stub .lead {
+    max-width: 46ch;
+  }
+</style>

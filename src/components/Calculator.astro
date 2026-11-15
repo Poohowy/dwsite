@@ -1,0 +1,357 @@
+---
+import SectionHead from "@/components/SectionHead.astro";
+import { t, type Lang } from "@/i18n";
+import { calculate, formatters } from "@/lib/calculator";
+
+interface Props {
+  lang: Lang;
+}
+const d = t(Astro.props.lang).calculator;
+const s = d.sliders;
+const fmt = formatters(d.locale, d.currency);
+
+// Server-rendered initial state, so results are meaningful even before JS runs.
+const initial = calculate({
+  people: s.people.initial,
+  hoursPerPersonWeek: s.hours.initial,
+  hourlyCost: s.rate.initial,
+});
+
+const sliders = [
+  { key: "people", n: "01", cfg: s.people, display: (v: number) => `${fmt.number(v)} ${s.people.unit}` },
+  { key: "hours", n: "02", cfg: s.hours, display: (v: number) => `${fmt.number(v)} ${s.hours.unit}` },
+  { key: "rate", n: "03", cfg: s.rate, display: (v: number) => fmt.money(v) },
+] as const;
+
+const pct = (v: number, min: number, max: number) => ((v - min) / (max - min)) * 100;
+---
+
+<section class="section calc" aria-labelledby="calc-title">
+  <div class="container">
+    <SectionHead id="calc-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} split />
+
+    <div
+      class="calc__panels"
+      data-calculator
+      data-locale={d.locale}
+      data-currency={d.currency}
+      data-unit-people={s.people.unit}
+      data-unit-hours={s.hours.unit}
+      data-unit-result={d.hoursUnit}
+      data-reveal
+    >
+      <fieldset class="calc__inputs light">
+        <legend class="visually-hidden">{d.inputsLabel}</legend>
+        {
+          sliders.map(({ key, n, cfg, display }) => (
+            <div class="slider">
+              <div class="slider__top">
+                <label class="slider__label" for={`calc-${key}`}>
+                  <span class="slider__num mono">{n}</span>
+                  {cfg.label}
+                </label>
+                <output class="slider__value" for={`calc-${key}`} data-display={key}>
+                  {display(cfg.initial)}
+                </output>
+              </div>
+              <input
+                class="slider__input"
+                type="range"
+                id={`calc-${key}`}
+                name={key}
+                min={cfg.min}
+                max={cfg.max}
+                step={cfg.step}
+                value={cfg.initial}
+                aria-valuetext={display(cfg.initial)}
+                data-input={key}
+                style={`--pct:${pct(cfg.initial, cfg.min, cfg.max)}%`}
+              />
+              <div class="slider__range mono" aria-hidden="true">
+                <span>{display(cfg.min)}</span>
+                <span>{display(cfg.max)}</span>
+              </div>
+            </div>
+          ))
+        }
+      </fieldset>
+
+      <div class="calc__results">
+        <p class="eyebrow">{d.resultsLabel}</p>
+        <dl class="results">
+          <div class="result">
+            <dt>{d.results.hours}</dt>
+            <dd data-result="hours">{fmt.number(initial.hoursPerWeek)} {d.hoursUnit}</dd>
+          </div>
+          <div class="result">
+            <dt>{d.results.monthly}</dt>
+            <dd data-result="monthly">{fmt.money(initial.costPerMonth)}</dd>
+          </div>
+          <div class="result result--main">
+            <dt>{d.results.yearly}</dt>
+            <dd data-result="yearly">{fmt.money(initial.costPerYear)}</dd>
+          </div>
+        </dl>
+        <div class="calc__notes">
+          <p>{d.disclaimer}</p>
+          <p class="mono calc__assumptions">{d.assumptions}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .calc__panels {
+    display: grid;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+
+  /* Left: light panel with sliders */
+  .calc__inputs {
+    margin: 0;
+    border: 0;
+    min-width: 0;
+    display: grid;
+    gap: clamp(2rem, 1.5rem + 1.5vw, 2.75rem);
+    padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
+  }
+
+  .slider {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .slider__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  .slider__label {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    font-weight: 500;
+    font-size: var(--text-base);
+    line-height: 1.35;
+  }
+
+  .slider__num {
+    font-size: var(--text-xs);
+    color: var(--color-brand-red);
+    flex: none;
+  }
+
+  .slider__value {
+    flex: none;
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.6rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .slider__range {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    color: var(--color-light-muted);
+  }
+
+  /* Range input — custom, touch friendly (44px hit area) */
+  .slider__input {
+    --track: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 44px;
+    margin: -12px 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .slider__input::-webkit-slider-runnable-track {
+    height: var(--track);
+    border-radius: 2px;
+    background: linear-gradient(
+      to right,
+      var(--color-light-text) 0 var(--pct),
+      var(--color-light-border) var(--pct) 100%
+    );
+  }
+
+  .slider__input::-moz-range-track {
+    height: var(--track);
+    border-radius: 2px;
+    background: var(--color-light-border);
+  }
+
+  .slider__input::-moz-range-progress {
+    height: var(--track);
+    border-radius: 2px;
+    background: var(--color-light-text);
+  }
+
+  .slider__input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    margin-top: calc((var(--track) - 22px) / 2);
+    border-radius: 50%;
+    background: var(--color-brand-red);
+    border: 4px solid var(--color-light-surface);
+    box-shadow: 0 0 0 1px var(--color-light-border);
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .slider__input::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-brand-red);
+    border: 4px solid var(--color-light-surface);
+    box-shadow: 0 0 0 1px var(--color-light-border);
+  }
+
+  .slider__input:active::-webkit-slider-thumb {
+    transform: scale(1.12);
+  }
+
+  .slider__input:focus-visible {
+    outline: none;
+  }
+
+  .slider__input:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px var(--color-brand-teal);
+  }
+
+  .slider__input:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 3px var(--color-brand-teal);
+  }
+
+  /* Right: dark results panel */
+  .calc__results {
+    display: grid;
+    align-content: start;
+    gap: 1.5rem;
+    padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
+    background: var(--color-surface);
+  }
+
+  .results {
+    margin: 0;
+    display: grid;
+  }
+
+  .result {
+    display: grid;
+    gap: 0.35rem;
+    padding-block: 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .result:first-child {
+    padding-top: 0.25rem;
+  }
+
+  .result dt {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .result dd {
+    margin: 0;
+    font-size: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  .result--main dd {
+    color: var(--color-text);
+  }
+
+  .result--main dt::after {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+    background: var(--color-brand-red);
+  }
+
+  .calc__notes {
+    display: grid;
+    gap: 0.75rem;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.55;
+  }
+
+  .calc__assumptions {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    opacity: 0.85;
+  }
+
+  @media (min-width: 900px) {
+    .calc__panels {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    }
+  }
+</style>
+
+<script>
+  import { calculate, formatters } from "@/lib/calculator";
+
+  document.querySelectorAll<HTMLElement>("[data-calculator]").forEach((root) => {
+    const { locale = "pl-PL", currency = "PLN", unitPeople = "", unitHours = "", unitResult = "h" } = root.dataset;
+    const fmt = formatters(locale, currency);
+
+    const input = (key: string) => root.querySelector<HTMLInputElement>(`[data-input="${key}"]`)!;
+    const display = (key: string) => root.querySelector<HTMLOutputElement>(`[data-display="${key}"]`)!;
+    const result = (key: string) => root.querySelector<HTMLElement>(`[data-result="${key}"]`)!;
+
+    const people = input("people");
+    const hours = input("hours");
+    const rate = input("rate");
+
+    const label: Record<string, (v: number) => string> = {
+      people: (v) => `${fmt.number(v)} ${unitPeople}`,
+      hours: (v) => `${fmt.number(v)} ${unitHours}`,
+      rate: (v) => fmt.money(v),
+    };
+
+    const update = () => {
+      for (const el of [people, hours, rate]) {
+        const key = el.dataset.input!;
+        const v = Number(el.value);
+        const min = Number(el.min);
+        const max = Number(el.max);
+        el.style.setProperty("--pct", `${((v - min) / (max - min)) * 100}%`);
+        const text = label[key](v);
+        display(key).textContent = text;
+        el.setAttribute("aria-valuetext", text);
+      }
+
+      const r = calculate({
+        people: Number(people.value),
+        hoursPerPersonWeek: Number(hours.value),
+        hourlyCost: Number(rate.value),
+      });
+      result("hours").textContent = `${fmt.number(r.hoursPerWeek)} ${unitResult}`;
+      result("monthly").textContent = fmt.money(r.costPerMonth);
+      result("yearly").textContent = fmt.money(r.costPerYear);
+    };
+
+    [people, hours, rate].forEach((el) => el.addEventListener("input", update));
+    update(); // sync with any browser-restored slider values
+  });
+</script>

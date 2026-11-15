@@ -1,0 +1,146 @@
+---
+import ArrowIcon from "@/components/ArrowIcon.astro";
+import SectionHead from "@/components/SectionHead.astro";
+import { processAnchor, t, type Lang } from "@/i18n";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const dict = t(lang);
+const d = dict.process;
+---
+
+<section class="section section--surface process" id={processAnchor(lang)} aria-labelledby="process-title">
+  <div class="container">
+    <SectionHead id="process-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} split />
+
+    <ol role="list" class="timeline" data-timeline>
+      {
+        d.steps.map((step, i) => (
+          <li class="step" data-step data-reveal style={`--reveal-delay:${i * 80}ms`}>
+            <div class="step__marker" aria-hidden="true">
+              <span class="step__dot" />
+            </div>
+            <span class="step__num mono">{String(i + 1).padStart(2, "0")}</span>
+            <h3 class="h3 step__title">{step.title}</h3>
+            <p class="step__text">{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="process__cta" data-reveal>
+      <a href={dict.routes.contact} class="btn btn--primary btn--block-mobile">
+        {d.cta}
+        <ArrowIcon />
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .timeline {
+    display: grid;
+    position: relative;
+  }
+
+  .step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    column-gap: 1.25rem;
+    row-gap: 0.4rem;
+    padding-bottom: 2.25rem;
+  }
+
+  .step__marker {
+    grid-row: 1 / span 3;
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Vertical connector (mobile) */
+  .step__marker::before {
+    content: "";
+    position: absolute;
+    top: 14px;
+    bottom: -2.25rem;
+    width: 1px;
+    background: var(--color-border);
+  }
+
+  .step:last-child .step__marker::before {
+    display: none;
+  }
+
+  .step__dot {
+    position: relative;
+    width: 13px;
+    height: 13px;
+    margin-top: 4px;
+    border: 1px solid var(--color-text-muted);
+    background: var(--color-surface);
+    transition:
+      background-color 400ms var(--ease-out),
+      border-color 400ms var(--ease-out);
+  }
+
+  .step.is-visible .step__dot {
+    border-color: var(--color-brand-red);
+  }
+
+  .step:first-child .step__dot {
+    background: var(--color-brand-red);
+    border-color: var(--color-brand-red);
+  }
+
+  .step__num {
+    font-size: var(--text-xs);
+    color: var(--color-teal-text);
+  }
+
+  .step__text {
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+    max-width: 34ch;
+  }
+
+  .process__cta {
+    margin-top: clamp(1rem, 0.5rem + 2vw, 3.5rem);
+  }
+
+  @media (min-width: 1024px) {
+    .timeline {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      column-gap: 1.5rem;
+    }
+
+    .step {
+      grid-template-columns: 1fr;
+      row-gap: 0.6rem;
+      padding-bottom: 0;
+    }
+
+    .step__marker {
+      grid-row: auto;
+      justify-content: flex-start;
+      height: 13px;
+      margin-bottom: 1.75rem;
+    }
+
+    /* Horizontal connector (desktop) */
+    .step__marker::before {
+      top: 6px;
+      bottom: auto;
+      left: 13px;
+      width: calc(100% + 1.5rem - 13px);
+      height: 1px;
+    }
+
+    .step__dot {
+      margin-top: 0;
+    }
+  }
+</style>

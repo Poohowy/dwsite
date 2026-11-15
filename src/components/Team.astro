@@ -1,0 +1,184 @@
+---
+import SectionHead from "@/components/SectionHead.astro";
+import { t, type Lang } from "@/i18n";
+
+interface Props {
+  lang: Lang;
+}
+const d = t(Astro.props.lang).team;
+
+/**
+ * TODO(content): replace placeholders with approved names, real photos
+ * (e.g. /public/images/team/*.webp, ~800×1000) and approved competence notes.
+ * Do not add job titles that have not been confirmed.
+ */
+const members: { name?: string; photo?: string; note?: string }[] = [{}, {}, {}];
+---
+
+<section class="section team" id="o-nas" aria-labelledby="team-title">
+  <div class="container">
+    <SectionHead id="team-title" eyebrow={d.eyebrow} title={d.title} />
+
+    <ul role="list" class="pillars">
+      {
+        d.pillars.map((p, i) => (
+          <li class="pillar" data-reveal style={`--reveal-delay:${i * 60}ms`}>
+            <span class="pillar__num mono">{String(i + 1).padStart(2, "0")}</span>
+            <h3 class="h3">{p.title}</h3>
+            <p class="muted">{p.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="people">
+      <div class="people__intro" data-reveal>
+        <h3 class="people__title">{d.teamTitle}</h3>
+        <p class="lead">{d.teamText}</p>
+      </div>
+
+      <ul role="list" class="people__list">
+        {
+          members.map((m, i) => (
+            <li class="person" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+              <div class="person__photo">
+                {m.photo ? (
+                  <img src={m.photo} alt={m.name ?? ""} width="800" height="1000" loading="lazy" decoding="async" />
+                ) : (
+                  <div class="person__placeholder" aria-hidden="true">
+                    <svg viewBox="0 0 80 100" fill="none">
+                      <circle cx="40" cy="38" r="15" stroke="currentColor" stroke-width="1.5" />
+                      <path d="M12 96c2-18 14-30 28-30s26 12 28 30" stroke="currentColor" stroke-width="1.5" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <p class="person__name">{m.name ?? d.placeholderName}</p>
+              <p class="person__note mono">{m.note ?? d.placeholderNote}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pillars {
+    display: grid;
+    gap: 1px;
+    background: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .pillar {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    background: var(--color-bg);
+  }
+
+  .pillar__num {
+    font-size: var(--text-xs);
+    color: var(--color-brand-red);
+    margin-bottom: 0.75rem;
+  }
+
+  .pillar p {
+    font-size: 0.9375rem;
+  }
+
+  .people {
+    display: grid;
+    gap: 2.5rem;
+    margin-top: clamp(4rem, 3rem + 4vw, 7rem);
+  }
+
+  .people__intro {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+
+  .people__title {
+    font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.4rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+    max-width: 18ch;
+  }
+
+  .people__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    gap: 1.25rem;
+  }
+
+  .person {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .person__photo {
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--color-surface);
+    margin-bottom: 0.75rem;
+  }
+
+  .person__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.05);
+    transition: filter 500ms var(--ease-out);
+  }
+
+  .person:hover .person__photo img {
+    filter: grayscale(0);
+  }
+
+  .person__placeholder {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    color: var(--color-border);
+    background:
+      repeating-linear-gradient(135deg, transparent 0 10px, rgb(255 255 255 / 0.015) 10px 11px),
+      var(--color-surface);
+  }
+
+  .person__placeholder svg {
+    width: 45%;
+  }
+
+  .person__name {
+    font-weight: 500;
+  }
+
+  .person__note {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 640px) {
+    .pillars {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .pillars {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .people {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
+      gap: clamp(3rem, 1rem + 4vw, 5rem);
+    }
+  }
+</style>

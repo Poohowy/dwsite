@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://datawildcat.example/sitemap-index.xml

@@ -1,0 +1,144 @@
+---
+import { alternates, processAnchor, t, type Lang } from "@/i18n";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const d = t(lang);
+const f = d.footer;
+const year = new Date().getFullYear();
+const alt = alternates("home");
+
+/*
+ * TODO(content): add e-mail, LinkedIn and privacy policy link once confirmed
+ * (HOMEPAGE_ARCHITECTURE_v1.1 §15 — do not publish unconfirmed data).
+ */
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href={d.routes.home} aria-label={d.nav.homeLabel}>
+          <img src="/images/data-wildcat-logo.svg" alt="Data Wildcat" width="415" height="106" loading="lazy" />
+        </a>
+        <p class="footer__tagline">{f.tagline}</p>
+      </div>
+
+      <nav class="footer__nav" aria-label={f.navLabel}>
+        <div>
+          <p class="footer__label mono">{f.productsLabel}</p>
+          <ul role="list">
+            <li><a href={d.routes.pricer}>{d.nav.pricer}</a></li>
+            <li><a href={d.routes.archiflow}>{d.nav.archiflow}</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer__label mono">{f.companyLabel}</p>
+          <ul role="list">
+            <li><a href={`${d.routes.home}#${processAnchor(lang)}`}>{d.nav.process}</a></li>
+            <li><a href={d.routes.contact}>{f.contact}</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <div class="footer__bottom">
+      <p>© {year} Data Wildcat. {f.rights}</p>
+      <div class="footer__lang mono" role="group" aria-label={d.nav.langLabel}>
+        <a href={alt.pl} hreflang="pl" lang="pl" aria-current={lang === "pl" ? "true" : undefined}>PL</a>
+        <span aria-hidden="true">/</span>
+        <a href={alt.en} hreflang="en" lang="en" aria-current={lang === "en" ? "true" : undefined}>EN</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--color-border-soft);
+    padding-top: clamp(3.5rem, 2.5rem + 3vw, 5.5rem);
+    padding-bottom: 2rem;
+    font-size: var(--text-sm);
+  }
+
+  .footer__top {
+    display: grid;
+    gap: 3rem;
+    padding-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+
+  .footer__brand {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+
+  .footer__brand img {
+    height: 34px;
+    width: auto;
+  }
+
+  .footer__tagline {
+    color: var(--color-text-muted);
+    max-width: 30ch;
+    font-size: var(--text-base);
+  }
+
+  .footer__nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
+  }
+
+  .footer__label {
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .footer__nav ul {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .footer__nav a,
+  .footer__lang a {
+    color: var(--color-text);
+    transition: color var(--dur) var(--ease-out);
+  }
+
+  .footer__nav a:hover,
+  .footer__lang a:hover {
+    color: var(--color-teal-text);
+  }
+
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border-soft);
+    color: var(--color-text-muted);
+  }
+
+  .footer__lang {
+    display: flex;
+    gap: 0.4rem;
+    font-size: var(--text-xs);
+  }
+
+  .footer__lang a[aria-current="true"] {
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 800px) {
+    .footer__top {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    }
+  }
+</style>

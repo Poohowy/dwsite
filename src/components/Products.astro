@@ -1,0 +1,340 @@
+---
+import ArrowIcon from "@/components/ArrowIcon.astro";
+import SectionHead from "@/components/SectionHead.astro";
+import { t, type Lang } from "@/i18n";
+
+interface Props {
+  lang: Lang;
+}
+const dict = t(Astro.props.lang);
+const d = dict.products;
+---
+
+<section class="section products" aria-labelledby="products-title">
+  <div class="container">
+    <SectionHead id="products-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} split />
+
+    <div class="products__list">
+      <!-- Pricer -->
+      <article class="product" aria-labelledby="pricer-title" data-reveal>
+        <div class="product__body">
+          <span class="badge">{d.pricer.status}</span>
+          <h3 class="product__name" id="pricer-title">{d.pricer.name}</h3>
+          <p class="lead product__text">{d.pricer.text}</p>
+          <a href={dict.routes.pricer} class="text-link">
+            {d.pricer.cta}
+            <ArrowIcon />
+          </a>
+        </div>
+
+        <figure class="product__visual" aria-hidden="true">
+          <div class="mock mock--pricer">
+            <div class="mock-card mock-mail">
+              <p class="mock-label mono">{d.pricer.mock.inbox}</p>
+              <span class="sk sk--w60"></span>
+              <span class="sk sk--w90"></span>
+              <span class="sk sk--w75"></span>
+              <span class="sk sk--w40"></span>
+            </div>
+            <div class="mock-arrow"><span></span></div>
+            <div class="mock-card mock-doc">
+              <div class="mock-doc__head">
+                <p class="mock-label mono">{d.pricer.mock.offer}</p>
+                <span class="mock-format mono">{d.pricer.mock.formats}</span>
+              </div>
+              <div class="mock-doc__rows">
+                {
+                  [80, 65, 72].map((w) => (
+                    <div class="mock-row">
+                      <span class="sk" style={`width:${w}%`} />
+                      <span class="sk sk--num" />
+                    </div>
+                  ))
+                }
+              </div>
+              <div class="mock-row mock-row--total">
+                <span class="sk sk--w30"></span>
+                <span class="sk sk--num sk--strong"></span>
+              </div>
+            </div>
+          </div>
+          <figcaption class="mock-note mono">{d.mockNote}</figcaption>
+        </figure>
+      </article>
+
+      <!-- ArchiFlow -->
+      <article class="product product--reverse" aria-labelledby="archiflow-title" data-reveal>
+        <div class="product__body">
+          <span class="badge" style="--badge-dot: var(--color-text-muted)">{d.archiflow.status}</span>
+          <h3 class="product__name" id="archiflow-title">{d.archiflow.name}</h3>
+          <p class="lead product__text">{d.archiflow.text}</p>
+          <a href={dict.routes.archiflow} class="text-link">
+            {d.archiflow.cta}
+            <ArrowIcon />
+          </a>
+        </div>
+
+        <figure class="product__visual" aria-hidden="true">
+          <div class="mock mock--board">
+            {
+              d.archiflow.mock.columns.map((col, i) => (
+                <div class="board-col">
+                  <p class="mock-label mono">{col}</p>
+                  {Array.from({ length: 3 - (i === 2 ? 1 : 0) }).map((_, j) => (
+                    <div class="mock-card board-card">
+                      <span class="sk" style={`width:${[70, 55, 80][j]}%`} />
+                      <span class="sk sk--w40" />
+                      <span class:list={["board-tag", { "board-tag--accent": i === 0 && j === 0 }]} />
+                    </div>
+                  ))}
+                </div>
+              ))
+            }
+          </div>
+          <figcaption class="mock-note mono">{d.mockNote}</figcaption>
+        </figure>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .products {
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .products__list {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .product {
+    display: grid;
+    gap: 2.5rem;
+    padding: clamp(1.5rem, 1rem + 2.5vw, 3.5rem);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+
+  .product__body {
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: 1.25rem;
+  }
+
+  .product__name {
+    font-size: clamp(2.25rem, 1.6rem + 2.8vw, 4rem);
+    font-weight: 600;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+
+  .product__text {
+    max-width: 46ch;
+    font-size: var(--text-md);
+  }
+
+  .product .text-link {
+    margin-top: 0.5rem;
+  }
+
+  .product .text-link:hover {
+    color: var(--color-teal-text);
+  }
+
+  /* ----- Mock-ups (deliberately abstract skeletons — no invented data) ----- */
+  .product__visual {
+    display: grid;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .mock {
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius);
+    background:
+      radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.05) 1px, transparent 0) 0 0 / 16px 16px,
+      var(--color-bg);
+    padding: clamp(1rem, 0.6rem + 1.5vw, 1.75rem);
+  }
+
+  .mock-note {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    justify-self: end;
+  }
+
+  .mock-card {
+    display: grid;
+    gap: 0.55rem;
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-raised);
+  }
+
+  .mock-label {
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .sk {
+    display: block;
+    height: 7px;
+    border-radius: 2px;
+    background: var(--color-border);
+  }
+  .sk--w30 { width: 30%; }
+  .sk--w40 { width: 40%; }
+  .sk--w60 { width: 60%; }
+  .sk--w75 { width: 75%; }
+  .sk--w90 { width: 90%; }
+  .sk--num {
+    width: 18%;
+    flex: none;
+  }
+  .sk--strong {
+    background: var(--color-text-muted);
+  }
+
+  /* Pricer: message → offer */
+  .mock--pricer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1.25fr);
+    align-items: center;
+  }
+
+  .mock-arrow {
+    position: relative;
+    height: 1px;
+    background: var(--color-brand-red);
+    margin-inline: 6px;
+  }
+  .mock-arrow span {
+    position: absolute;
+    right: -1px;
+    top: -4px;
+    width: 9px;
+    height: 9px;
+    border-top: 1px solid var(--color-brand-red);
+    border-right: 1px solid var(--color-brand-red);
+    transform: rotate(45deg);
+  }
+
+  .mock-doc {
+    background: var(--color-light-bg);
+    border-color: transparent;
+  }
+  .mock-doc .mock-label {
+    color: var(--color-light-muted);
+  }
+  .mock-doc .sk {
+    background: var(--color-light-border);
+  }
+  .mock-doc .sk--strong {
+    background: var(--color-light-text);
+  }
+
+  .mock-doc__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--color-light-border);
+  }
+
+  .mock-format {
+    font-size: 0.625rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    background: var(--color-light-text);
+    color: var(--color-light-bg);
+    white-space: nowrap;
+  }
+
+  .mock-doc__rows {
+    display: grid;
+    gap: 0.7rem;
+    padding-block: 0.4rem;
+  }
+
+  .mock-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .mock-row--total {
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--color-light-border);
+  }
+
+  /* ArchiFlow: board */
+  .mock--board {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    align-items: start;
+  }
+
+  .board-col {
+    display: grid;
+    gap: 0.6rem;
+    min-width: 0;
+  }
+
+  .board-card {
+    padding: 0.75rem;
+  }
+
+  .board-tag {
+    width: 28px;
+    height: 7px;
+    border-radius: 2px;
+    background: var(--color-brand-teal);
+    opacity: 0.6;
+    margin-top: 0.2rem;
+  }
+
+  .board-tag--accent {
+    background: var(--color-brand-red);
+    opacity: 1;
+  }
+
+  @media (min-width: 960px) {
+    .product {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      gap: clamp(2.5rem, 1rem + 4vw, 5rem);
+    }
+    .product--reverse .product__body {
+      order: 2;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .mock--pricer {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .mock-arrow {
+      width: 1px;
+      height: 28px;
+      margin: 6px auto;
+    }
+    .mock-arrow span {
+      right: -4px;
+      top: auto;
+      bottom: -1px;
+      transform: rotate(135deg);
+    }
+  }
+</style>

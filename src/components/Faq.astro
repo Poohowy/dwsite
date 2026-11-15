@@ -1,0 +1,154 @@
+---
+import SectionHead from "@/components/SectionHead.astro";
+import { t, type Lang } from "@/i18n";
+
+interface Props {
+  lang: Lang;
+}
+const d = t(Astro.props.lang).faq;
+---
+
+<section class="section section--surface faq" aria-labelledby="faq-title">
+  <div class="container faq__inner">
+    <SectionHead id="faq-title" eyebrow={d.eyebrow} title={d.title} />
+
+    <!-- Native <details name> gives an exclusive, keyboard-accessible accordion without JS. -->
+    <div class="faq__list" data-reveal>
+      {
+        d.items.map((item, i) => (
+          <details class="qa" name="faq">
+            <summary class="qa__q">
+              <span class="qa__num mono">{String(i + 1).padStart(2, "0")}</span>
+              <span class="qa__text">{item.q}</span>
+              <span class="qa__icon" aria-hidden="true" />
+            </summary>
+            <div class="qa__a">
+              <p>{item.a}</p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq__list {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .qa {
+    border-bottom: 1px solid var(--color-border);
+    interpolate-size: allow-keywords;
+  }
+
+  .qa__q {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr) 24px;
+    gap: 1rem;
+    align-items: center;
+    padding-block: 1.4rem;
+    cursor: pointer;
+    list-style: none;
+    font-size: var(--text-md);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+    transition: color var(--dur) var(--ease-out);
+  }
+
+  .qa__q::-webkit-details-marker {
+    display: none;
+  }
+
+  .qa__q:hover .qa__text {
+    color: var(--color-text);
+  }
+
+  .qa__text {
+    color: var(--color-text);
+  }
+
+  .qa__num {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .qa[open] .qa__num {
+    color: var(--color-brand-red);
+  }
+
+  .qa__icon {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+  }
+
+  .qa__icon::before,
+  .qa__icon::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 10px;
+    height: 1.5px;
+    background: var(--color-text);
+    transform: translate(-50%, -50%);
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .qa__icon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  .qa[open] .qa__icon::after {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  .qa__a {
+    padding: 0 2.5rem 1.6rem calc(2.5rem + 1rem);
+    color: var(--color-text-muted);
+    max-width: 75ch;
+  }
+
+  /* Progressive enhancement: smooth height where supported */
+  .qa::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition:
+      block-size 300ms var(--ease-out),
+      content-visibility 300ms allow-discrete;
+  }
+
+  .qa[open]::details-content {
+    block-size: auto;
+  }
+
+  @media (max-width: 559px) {
+    .qa__q {
+      grid-template-columns: minmax(0, 1fr) 24px;
+    }
+    .qa__num {
+      display: none;
+    }
+    .qa__a {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .faq__inner {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
+      gap: 4rem;
+      align-items: start;
+    }
+    .faq__inner :global(.section-head) {
+      position: sticky;
+      top: calc(var(--header-h) + 2rem);
+    }
+  }
+</style>
