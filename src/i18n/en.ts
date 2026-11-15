@@ -243,6 +243,10 @@ export const en: Dictionary = {
     productsLabel: "Products",
     companyLabel: "Company",
     contact: "Contact",
+    faq: "FAQ",
+    addressLabel: "Address",
+    taxIdLabel: "Tax ID",
+    krsLabel: "National Court Register",
     rights: "All rights reserved.",
   },
   stub: {

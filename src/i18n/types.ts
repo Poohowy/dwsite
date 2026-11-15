@@ -119,6 +119,17 @@ export interface Dictionary {
   };
   faq: { eyebrow: string; title: string; items: { q: string; a: string }[] };
   finalCta: { title: string; text: string };
-  footer: { tagline: string; navLabel: string; productsLabel: string; companyLabel: string; contact: string; rights: string };
+  footer: {
+    tagline: string;
+    navLabel: string;
+    productsLabel: string;
+    companyLabel: string;
+    contact: string;
+    faq: string;
+    addressLabel: string;
+    taxIdLabel: string;
+    krsLabel: string;
+    rights: string;
+  };
   stub: { badge: string; text: string; back: string };
 }

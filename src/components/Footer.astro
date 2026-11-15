@@ -1,5 +1,5 @@
 ---
-import { alternates, processAnchor, t, type Lang } from "@/i18n";
+import { alternates, approachAnchor, processAnchor, t, type Lang } from "@/i18n";
 
 interface Props {
   lang: Lang;
@@ -9,6 +9,14 @@ const d = t(lang);
 const f = d.footer;
 const year = new Date().getFullYear();
 const alt = alternates("home");
+const home = d.routes.home;
+
+/** Registered company details — identical in both languages. */
+const COMPANY = {
+  addressLines: ["Aleja Jana Pawła II 43A / 37B", "01-001 Warszawa, Polska"],
+  nip: "5273161911",
+  krs: "0001169277",
+};
 
 /*
  * TODO(content): add e-mail, LinkedIn and privacy policy link once confirmed
@@ -24,21 +32,42 @@ const alt = alternates("home");
           <img src="/images/data-wildcat-logo.svg" alt="Data Wildcat" width="415" height="106" loading="lazy" />
         </a>
         <p class="footer__tagline">{f.tagline}</p>
+
+        <div class="footer__company">
+          <div>
+            <p class="footer__company-label mono">{f.addressLabel}</p>
+            <address>
+              {COMPANY.addressLines.map((line) => <span>{line}</span>)}
+            </address>
+          </div>
+          <dl class="footer__reg">
+            <div>
+              <dt class="mono">{f.taxIdLabel}</dt>
+              <dd>{COMPANY.nip}</dd>
+            </div>
+            <div>
+              <dt class="mono">{f.krsLabel}</dt>
+              <dd>{COMPANY.krs}</dd>
+            </div>
+          </dl>
+        </div>
       </div>
 
       <nav class="footer__nav" aria-label={f.navLabel}>
+        <div>
+          <p class="footer__label mono">{f.companyLabel}</p>
+          <ul role="list">
+            <li><a href={`${home}#${processAnchor(lang)}`}>{d.nav.process}</a></li>
+            <li><a href={`${home}#${approachAnchor(lang)}`}>{d.nav.approach}</a></li>
+            <li><a href={`${home}#faq`}>{f.faq}</a></li>
+            <li><a href={d.routes.contact}>{f.contact}</a></li>
+          </ul>
+        </div>
         <div>
           <p class="footer__label mono">{f.productsLabel}</p>
           <ul role="list">
             <li><a href={d.routes.pricer}>{d.nav.pricer}</a></li>
             <li><a href={d.routes.archiflow}>{d.nav.archiflow}</a></li>
-          </ul>
-        </div>
-        <div>
-          <p class="footer__label mono">{f.companyLabel}</p>
-          <ul role="list">
-            <li><a href={`${d.routes.home}#${processAnchor(lang)}`}>{d.nav.process}</a></li>
-            <li><a href={d.routes.contact}>{f.contact}</a></li>
           </ul>
         </div>
       </nav>
@@ -84,6 +113,46 @@ const alt = alternates("home");
     color: var(--color-text-muted);
     max-width: 30ch;
     font-size: var(--text-base);
+  }
+
+  /* Company details: understated, under the logo and slogan */
+  .footer__company {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem 2.5rem;
+    justify-self: stretch;
+    max-width: 34rem;
+    margin-top: 0.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-border-soft);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  .footer__company address {
+    display: grid;
+    font-style: normal;
+  }
+
+  .footer__company-label,
+  .footer__reg dt {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .footer__reg {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+  }
+
+  .footer__reg dd {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
   }
 
   .footer__nav {

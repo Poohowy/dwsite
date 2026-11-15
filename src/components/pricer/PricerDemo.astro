@@ -1,0 +1,1010 @@
+---
+/**
+ * Interactive Pricer demo (frontend-only simulation, clearly labelled).
+ * All scenarios are rendered from data (src/i18n/pricer.ts → demo.scenarios);
+ * the script only toggles which pane is visible and plays the state sequence.
+ * Without JS: the first scenario's email and sample offer are shown statically.
+ */
+import type { PricerCopy } from "@/i18n/pricer";
+
+interface Props {
+  demo: PricerCopy["demo"];
+  locale: string;
+  currency: string;
+}
+const { demo, locale, currency } = Astro.props;
+
+const money = new Intl.NumberFormat(locale, { style: "currency", currency, minimumFractionDigits: 2 });
+const percent = new Intl.NumberFormat(locale, { style: "percent", minimumFractionDigits: 1 });
+const first = demo.scenarios[0]?.id;
+---
+
+<div
+  class="demo"
+  data-pricer-demo
+  data-state="idle"
+  data-scenario={first}
+  data-label-running={demo.running}
+  data-label-done={demo.done}
+>
+  <p class="demo__notice">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.2"></circle><path d="M8 7v4.2M8 4.8v.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path></svg>
+    {demo.notice}
+  </p>
+  <p class="demo__nojs">{demo.noscript}</p>
+
+  <div class="demo__frame">
+    <!-- Input side -->
+    <div class="demo__input">
+      <fieldset class="scenarios">
+        <legend class="scenarios__legend mono">{demo.selectorLabel}</legend>
+        <div class="scenarios__list">
+          {
+            demo.scenarios.map((s, i) => (
+              <label class="scn">
+                <input
+                  type="radio"
+                  name="pricer-scenario"
+                  value={s.id}
+                  checked={i === 0}
+                  class="scn__input"
+                  data-scenario-input
+                />
+                <span class="scn__box">
+                  <span class="scn__radio" aria-hidden="true" />
+                  <span class="scn__text">
+                    <span class="scn__label">{s.label}</span>
+                    <span class="scn__hint">{s.hint}</span>
+                  </span>
+                </span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+
+      {
+        demo.scenarios.map((s) => (
+          <article
+            class="mail"
+            data-pane={s.id}
+            data-default={s.id === first ? "" : undefined}
+            aria-label={demo.emailLabel}
+          >
+            <header class="mail__head">
+              <span class="mail__avatar" aria-hidden="true">
+                {s.email.from
+                  .split(" ")
+                  .map((p) => p[0])
+                  .join("")}
+              </span>
+              <div class="mail__meta">
+                <span class="mail__from">{s.email.from}</span>
+                <span class="mail__subject">
+                  <span class="visually-hidden">{demo.subjectLabel}: </span>
+                  {s.email.subject}
+                </span>
+              </div>
+              <span class="mail__tag mono">{demo.emailLabel}</span>
+            </header>
+            <p class="mail__body">{s.email.body}</p>
+          </article>
+        ))
+      }
+
+      <div class="demo__actions">
+        <button type="button" class="btn btn--primary demo__generate" data-generate>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5v9l7-4.5z" fill="currentColor"></path></svg>
+          {demo.generate}
+        </button>
+        <button type="button" class="btn btn--ghost" data-again hidden>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.5v2.8h2.8" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg>
+          {demo.again}
+        </button>
+      </div>
+    </div>
+
+    <!-- Output side -->
+    <div class="demo__output" data-output aria-live="polite">
+      <p class="visually-hidden" data-status></p>
+
+      <div class="out-idle">
+        <svg viewBox="0 0 48 48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="11" y="6" width="26" height="36" rx="2"></rect><path d="M16 14h16M16 20h10M16 26h16M16 32h8"></path>
+        </svg>
+        <p>{demo.placeholder}</p>
+      </div>
+
+      <ol class="out-steps" role="list">
+        {
+          demo.steps.map((step, i) => (
+            <li class="out-step" data-step>
+              <span class="out-step__icon" aria-hidden="true">
+                <span class="out-step__num mono">{i + 1}</span>
+                <svg class="out-step__check" viewBox="0 0 16 16">
+                  <path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" />
+                </svg>
+              </span>
+              <span class="out-step__label">{step}</span>
+            </li>
+          ))
+        }
+      </ol>
+
+      {
+        demo.scenarios.map((s) => (
+          <article
+            class="result"
+            data-pane={s.id}
+            data-default={s.id === first ? "" : undefined}
+            aria-label={demo.offerBadge}
+          >
+            <div class="detected">
+              <p class="detected__label mono">{demo.detectedLabel}</p>
+              <ul class="detected__list" role="list">
+                {s.detected.map((d) => (
+                  <li class:list={["chip", { "chip--budget": d.highlight }]}>
+                    <span class="chip__k">{d.label}</span>
+                    <span class="chip__v">{d.value}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div class="doc">
+              <header class="doc__head">
+                <span class="doc__logo" aria-hidden="true" />
+                <h3 class="doc__title">{s.offer.title}</h3>
+                <span class="doc__badge mono">{demo.offerBadge}</span>
+              </header>
+
+              <dl class="doc__meta">
+                <div>
+                  <dt>{demo.customerLabel}</dt>
+                  <dd>{s.offer.customer}</dd>
+                </div>
+                <div>
+                  <dt>{demo.quantityLabel}</dt>
+                  <dd>{s.offer.quantity}</dd>
+                </div>
+              </dl>
+
+              <div class="doc__block">
+                <p class="doc__label">{demo.itemsLabel}</p>
+                <ul class="doc__items" role="list">
+                  {s.offer.items.map((item) => (
+                    <li>
+                      <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.6" />
+                      </svg>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {s.offer.pricing && (
+                <div class="doc__block">
+                  <p class="doc__label">{demo.perBasket}</p>
+                  <table class="price">
+                    <tbody>
+                      <tr>
+                        <th scope="row">{demo.netLabel}</th>
+                        <td>{money.format(s.offer.pricing.net)}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">{demo.vatLabel}</th>
+                        <td>{money.format(s.offer.pricing.vat)}</td>
+                      </tr>
+                      <tr class="price__gross">
+                        <th scope="row">{demo.grossLabel}</th>
+                        <td>{money.format(s.offer.pricing.gross)}</td>
+                      </tr>
+                      <tr class="price__discount">
+                        <th scope="row">
+                          {demo.discountLabel} ({s.offer.quantity})
+                        </th>
+                        <td>{percent.format(s.offer.pricing.discountPercent / 100)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {s.offer.budget && (
+                <div class="doc__block">
+                  <div class="budget">
+                    <div class="budget__top">
+                      <span class="doc__label">{demo.budgetLabel}</span>
+                      <span class="budget__value">
+                        {money.format(s.offer.budget.limitNet)} <small>{demo.budgetPerBasket}</small>
+                      </span>
+                    </div>
+                    <div class="budget__bar" aria-hidden="true">
+                      <span class="budget__fill" />
+                      <span class="budget__limit" />
+                    </div>
+                  </div>
+                  <p class="doc__label doc__label--spaced">{s.offer.budget.suggestionsTitle}</p>
+                  <ul class="suggest" role="list">
+                    {s.offer.budget.suggestions.map((text) => (
+                      <li>
+                        <span class="suggest__plus" aria-hidden="true">+</span>
+                        {text}
+                      </li>
+                    ))}
+                  </ul>
+                  <p class="review">
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                      <circle cx="8" cy="5.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.3" />
+                      <path d="M3 13.5c.6-2.5 2.6-4 5-4s4.4 1.5 5 4" fill="none" stroke="currentColor" stroke-width="1.3" />
+                    </svg>
+                    {s.offer.budget.reviewNote}
+                  </p>
+                </div>
+              )}
+
+              <footer class="doc__foot">
+                <span class="doc__formats">
+                  <span class="doc__formats-label">{demo.formatsLabel}</span>
+                  <b class="mono">HTML</b>
+                  <b class="mono">PDF</b>
+                </span>
+                <span class="doc__note">{s.offer.note}</span>
+              </footer>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .demo {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .demo__notice {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    justify-self: center;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid rgb(31 140 165 / 0.45);
+    border-radius: 999px;
+    background: rgb(31 140 165 / 0.08);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    text-align: center;
+  }
+
+  .demo__notice svg {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    color: var(--color-teal-text);
+  }
+
+  .demo__nojs {
+    display: none;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* ---------- Frame ---------- */
+  .demo__frame {
+    display: grid;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, #151a1d, #101417);
+    box-shadow: 0 40px 90px -50px rgb(0 0 0 / 0.95);
+    overflow: hidden;
+  }
+
+  .demo__input,
+  .demo__output {
+    display: grid;
+    align-content: start;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 0.9rem + 1.6vw, 2.25rem);
+    min-width: 0;
+  }
+
+  .demo__output {
+    position: relative;
+    border-top: 1px solid var(--color-border);
+    background:
+      radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.04) 1px, transparent 0) 0 0 / 16px 16px,
+      #0e1214;
+    min-height: 420px;
+  }
+
+  /* ---------- Scenario selector ---------- */
+  .scenarios {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .scenarios__legend {
+    padding: 0;
+    margin-bottom: 0.75rem;
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .scenarios__list {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .scn {
+    position: relative;
+    display: block;
+    cursor: pointer;
+  }
+
+  .scn__input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .scn__box {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    transition:
+      border-color var(--dur) var(--ease-out),
+      background-color var(--dur) var(--ease-out);
+  }
+
+  .scn:hover .scn__box {
+    border-color: var(--color-text-muted);
+  }
+
+  .scn__input:checked + .scn__box {
+    border-color: var(--color-brand-teal);
+    background: rgb(31 140 165 / 0.09);
+  }
+
+  .scn__input:focus-visible + .scn__box {
+    outline: 2px solid var(--color-teal-text);
+    outline-offset: 2px;
+  }
+
+  .scn__radio {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-top: 0.1rem;
+    border: 1.5px solid var(--color-text-muted);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    transition: border-color var(--dur) var(--ease-out);
+  }
+
+  .scn__radio::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-teal-text);
+    transform: scale(0);
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .scn__input:checked + .scn__box .scn__radio {
+    border-color: var(--color-teal-text);
+  }
+
+  .scn__input:checked + .scn__box .scn__radio::after {
+    transform: scale(1);
+  }
+
+  .scn__text {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .scn__label {
+    font-weight: 500;
+    color: var(--color-text);
+    line-height: 1.35;
+  }
+
+  .scn__hint {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  /* ---------- Email ---------- */
+  .mail {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: #1a2024;
+    overflow: hidden;
+  }
+
+  .mail__head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    background: rgb(255 255 255 / 0.02);
+  }
+
+  .mail__avatar {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2a6f80, var(--color-brand-teal));
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .mail__meta {
+    display: grid;
+    min-width: 0;
+    line-height: 1.3;
+  }
+
+  .mail__from {
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .mail__subject {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mail__tag {
+    margin-left: auto;
+    flex: none;
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .mail__body {
+    padding: 1.1rem 1.1rem 1.3rem;
+    white-space: pre-line;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--color-text);
+  }
+
+  .demo__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .demo__actions svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .demo__generate[disabled] {
+    opacity: 0.6;
+    cursor: progress;
+    transform: none;
+  }
+
+  /* ---------- Output: idle / steps / result ---------- */
+  .out-idle {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 1rem;
+    min-height: 340px;
+    padding: 2rem;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius);
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .out-idle svg {
+    width: 44px;
+    height: 44px;
+    color: var(--color-border);
+  }
+
+  .out-idle p {
+    max-width: 30ch;
+  }
+
+  .out-steps {
+    display: none;
+    gap: 0.6rem;
+    align-content: center;
+    min-height: 340px;
+  }
+
+  .out-step {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    transition:
+      color 250ms var(--ease-out),
+      border-color 250ms var(--ease-out),
+      background-color 250ms var(--ease-out);
+  }
+
+  .out-step__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    transition:
+      background-color 250ms var(--ease-out),
+      border-color 250ms var(--ease-out);
+  }
+
+  .out-step__num {
+    font-size: 0.6875rem;
+  }
+
+  .out-step__check {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    opacity: 0;
+    color: #fff;
+  }
+
+  .out-step:global(.is-active) {
+    color: var(--color-text);
+    border-color: rgb(31 140 165 / 0.6);
+  }
+
+  .out-step:global(.is-active) .out-step__icon {
+    border-color: var(--color-teal-text);
+    animation: step-pulse 900ms ease-in-out infinite;
+  }
+
+  .out-step:global(.is-done) {
+    color: var(--color-text);
+  }
+
+  .out-step:global(.is-done) .out-step__icon {
+    background: var(--color-brand-teal);
+    border-color: var(--color-brand-teal);
+  }
+
+  .out-step:global(.is-done) .out-step__num {
+    opacity: 0;
+  }
+
+  .out-step:global(.is-done) .out-step__check {
+    opacity: 1;
+  }
+
+  @keyframes step-pulse {
+    50% {
+      box-shadow: 0 0 0 5px rgb(79 179 203 / 0.15);
+    }
+  }
+
+  .result {
+    display: grid;
+    gap: 1rem;
+  }
+
+  /* State switching (JS). Without JS the default pane + static result show. */
+  :global(html.js) .demo [data-pane]:not(.is-active) {
+    display: none;
+  }
+  :global(html.js) .demo:not([data-state="idle"]) .out-idle,
+  :global(html.js) .demo:not([data-state="done"]) .result {
+    display: none;
+  }
+  :global(html.js) .demo[data-state="running"] .out-steps {
+    display: grid;
+  }
+  :global(html.js) .demo[data-state="done"] .result {
+    animation: result-in 500ms var(--ease-reveal) both;
+  }
+  :global(html.js) .demo .mail:global(.is-active) {
+    animation: result-in 350ms var(--ease-out) both;
+  }
+
+  :global(html:not(.js)) .demo [data-pane]:not([data-default]),
+  :global(html:not(.js)) .demo .scenarios,
+  :global(html:not(.js)) .demo .demo__actions,
+  :global(html:not(.js)) .demo .out-idle {
+    display: none;
+  }
+  :global(html:not(.js)) .demo__nojs {
+    display: block;
+  }
+
+  @keyframes result-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  /* ---------- Detected chips ---------- */
+  .detected__label {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-teal-text);
+    margin-bottom: 0.55rem;
+  }
+
+  .detected__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .chip {
+    display: inline-flex;
+    gap: 0.4rem;
+    max-width: 100%;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid rgb(31 140 165 / 0.4);
+    border-radius: 6px;
+    background: rgb(31 140 165 / 0.08);
+    font-size: 0.8125rem;
+    line-height: 1.35;
+  }
+
+  .chip__k {
+    color: var(--color-text-muted);
+    flex: none;
+  }
+
+  .chip__v {
+    color: var(--color-text);
+  }
+
+  .chip--budget {
+    border-color: rgb(228 0 58 / 0.5);
+    background: rgb(228 0 58 / 0.08);
+  }
+
+  /* ---------- Offer document (light paper) ---------- */
+  .doc {
+    display: grid;
+    gap: 1.1rem;
+    padding: clamp(1.1rem, 0.8rem + 1.2vw, 1.75rem);
+    border-radius: var(--radius);
+    background: #f8f8f6;
+    color: var(--color-light-text);
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 0.05),
+      0 30px 60px -28px rgb(0 0 0 / 0.9);
+  }
+
+  .doc__head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem 0.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e4e1;
+  }
+
+  .doc__logo {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    border-radius: 5px;
+    background: linear-gradient(135deg, var(--color-brand-red) 50%, var(--color-brand-teal) 50%);
+  }
+
+  .doc__title {
+    margin-right: auto;
+    font-size: clamp(1rem, 0.9rem + 0.4vw, 1.2rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .doc__badge {
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.5rem;
+    border: 1px dashed #c1c6c3;
+    border-radius: 4px;
+    color: var(--color-light-muted);
+  }
+
+  .doc__meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0;
+  }
+
+  .doc__meta dt,
+  .doc__label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-light-muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .doc__label--spaced {
+    margin-top: 1rem;
+  }
+
+  .doc__meta dd {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .doc__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .doc__items li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 5px;
+    background: #eceeeb;
+    font-size: 0.875rem;
+  }
+
+  .doc__items svg {
+    width: 12px;
+    height: 12px;
+    color: #17707f;
+  }
+
+  .price {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .price th,
+  .price td {
+    padding: 0.55rem 0.75rem;
+    border-top: 1px solid #e6e8e5;
+  }
+
+  .price th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--color-light-muted);
+  }
+
+  .price td {
+    text-align: right;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .price tr:first-child th,
+  .price tr:first-child td {
+    border-top: 0;
+  }
+
+  .price__gross th,
+  .price__gross td {
+    background: #eef0ed;
+    color: var(--color-light-text);
+    font-weight: 700;
+  }
+
+  .price__discount th,
+  .price__discount td {
+    font-size: 0.8125rem;
+  }
+
+  /* Budget */
+  .budget {
+    padding: 0.9rem 1rem;
+    border: 1px solid #e3e5e2;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .budget__top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .budget__value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .budget__value small {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-light-muted);
+  }
+
+  /* Abstract "within the limit" bar — no figures implied */
+  .budget__bar {
+    position: relative;
+    height: 8px;
+    margin-top: 0.75rem;
+    border-radius: 4px;
+    background: #e7e9e6;
+  }
+
+  .budget__fill {
+    position: absolute;
+    inset: 0 18% 0 0;
+    border-radius: 4px;
+    background: repeating-linear-gradient(135deg, #1f8ca5 0 6px, #2a9db6 6px 12px);
+    opacity: 0.85;
+  }
+
+  .budget__limit {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    right: 14%;
+    width: 2px;
+    background: var(--color-brand-red);
+  }
+
+  .suggest {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .suggest li {
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px dashed #c9cdca;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #2b2f31;
+  }
+
+  .suggest__plus {
+    flex: none;
+    font-weight: 700;
+    color: #17707f;
+  }
+
+  .review {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #17707f;
+  }
+
+  .review svg {
+    width: 16px;
+    height: 16px;
+    flex: none;
+  }
+
+  .doc__foot {
+    display: grid;
+    gap: 0.6rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e4e1;
+  }
+
+  .doc__formats {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .doc__formats-label {
+    font-size: 0.75rem;
+    color: var(--color-light-muted);
+    margin-right: 0.25rem;
+  }
+
+  .doc__formats b {
+    font-weight: 500;
+    font-size: 0.6875rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    background: var(--color-light-text);
+    color: #fff;
+  }
+
+  .doc__formats b + b {
+    background: var(--color-brand-red);
+  }
+
+  .doc__note {
+    font-size: 0.75rem;
+    color: var(--color-light-muted);
+    line-height: 1.5;
+  }
+
+  @media (min-width: 1024px) {
+    .demo__frame {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    }
+    .demo__output {
+      border-top: 0;
+      border-left: 1px solid var(--color-border);
+    }
+  }
+
+  @media (max-width: 479px) {
+    .mail__tag {
+      display: none;
+    }
+    .demo__actions .btn {
+      width: 100%;
+    }
+    .out-idle,
+    .out-steps {
+      min-height: 260px;
+    }
+    .demo__output {
+      min-height: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .out-step:global(.is-active) .out-step__icon {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import { initPricerDemo } from "@/scripts/pricer-demo";
+  document.querySelectorAll<HTMLElement>("[data-pricer-demo]").forEach(initPricerDemo);
+</script>

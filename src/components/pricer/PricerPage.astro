@@ -1,0 +1,606 @@
+---
+/**
+ * Pricer product landing page (PL: /pricer/, EN: /en/pricer/).
+ * Page-specific: reuses global tokens/classes and existing components
+ * (Base, SectionHead, ArrowIcon) without modifying them.
+ * Content: src/i18n/pricer.ts (per docs/PRICER_PRODUCT_LANDING_PAGE_SPECIFICATION_v1.0.md).
+ * Screenshot section intentionally omitted until the three product screenshots are supplied.
+ */
+import ArrowIcon from "@/components/ArrowIcon.astro";
+import SectionHead from "@/components/SectionHead.astro";
+import { t, type Lang } from "@/i18n";
+import { pricerCopy } from "@/i18n/pricer";
+import Base from "@/layouts/Base.astro";
+import PricerDemo from "./PricerDemo.astro";
+import PricerFlow from "./PricerFlow.astro";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const dict = t(lang);
+const c = pricerCopy(lang);
+const contact = dict.routes.contact;
+const DEMO_ID = "demo";
+
+const benefitIcons = [
+  // data / catalogue
+  '<rect x="3.5" y="4" width="17" height="16" rx="1.5"/><path d="M3.5 9h17M3.5 14h17M10 4v16"/>',
+  // rules
+  '<path d="M4 7h10M4 12h16M4 17h7"/><circle cx="17" cy="7" r="2.5"/><circle cx="14" cy="17" r="2.5"/>',
+  // you decide
+  '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/>',
+  // history
+  '<path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v3.5h3.5"/><path d="M12 8v4.5l3 2"/>',
+];
+---
+
+<Base lang={lang} page="pricer" title={c.meta.title} description={c.meta.description}>
+  <!-- 1. Hero -->
+  <section class="px-hero" aria-labelledby="pricer-title">
+    <div class="px-hero__bg" aria-hidden="true"></div>
+    <div class="container px-hero__inner">
+      <div class="px-hero__content">
+        <p class="eyebrow px-in" style="--i:0">{c.hero.eyebrow}</p>
+        <h1 class="px-hero__title px-in" id="pricer-title" style="--i:1">
+          {c.hero.title.replace(/\.$/, "")}<span class="accent">.</span>
+        </h1>
+        <p class="lead px-hero__lead px-in" style="--i:2">{c.hero.lead}</p>
+        <div class="px-hero__actions px-in" style="--i:3">
+          <a href={contact} class="btn btn--primary btn--block-mobile">{dict.cta.primary} <ArrowIcon /></a>
+          <a href={`#${DEMO_ID}`} class="btn btn--ghost btn--block-mobile">{c.hero.secondary} <ArrowIcon direction="down" /></a>
+        </div>
+      </div>
+      <PricerFlow flow={c.hero.flow} />
+    </div>
+  </section>
+
+  <!-- 2. Problem -->
+  <section class="section section--surface px-problem" aria-labelledby="px-problem-title">
+    <div class="container px-problem__inner">
+      <div class="px-problem__head">
+        <SectionHead id="px-problem-title" eyebrow={c.problem.eyebrow} title={c.problem.title} intro={c.problem.intro} />
+      </div>
+      <div class="px-problem__body">
+        <ol class="tasks" role="list">
+          {
+            c.problem.tasks.map((task, i) => (
+              <li class="task" data-reveal>
+                <span class="task__num mono">{String(i + 1).padStart(2, "0")}</span>
+                <span class="task__text">{task}</span>
+              </li>
+            ))
+          }
+        </ol>
+        <p class="px-problem__closing" data-reveal>{c.problem.closing}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. How it works -->
+  <section class="section section--rule px-how" aria-labelledby="px-how-title">
+    <div class="container">
+      <SectionHead id="px-how-title" eyebrow={c.how.eyebrow} title={c.how.title} layout="center" />
+      <ol class="flow" role="list">
+        {
+          c.how.steps.map((step, i) => (
+            <li class:list={["flow__step", { "flow__step--review": i === 3 }]} data-reveal>
+              <div class="flow__top">
+                <span class="flow__num mono">{String(i + 1).padStart(2, "0")}</span>
+                {i === 3 && (
+                  <span class="flow__badge mono">
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                      <circle cx="8" cy="5.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.3" />
+                      <path d="M3 13.5c.6-2.5 2.6-4 5-4s4.4 1.5 5 4" fill="none" stroke="currentColor" stroke-width="1.3" />
+                    </svg>
+                    {c.how.reviewBadge}
+                  </span>
+                )}
+              </div>
+              <h3 class="h3">{step.title}</h3>
+              <p class="flow__text">{step.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- 4. Interactive demo -->
+  <section class="section section--surface px-demo" id={DEMO_ID} aria-labelledby="px-demo-title">
+    <div class="px-demo__glow" aria-hidden="true"></div>
+    <div class="container">
+      <SectionHead id="px-demo-title" eyebrow={c.demo.eyebrow} title={c.demo.title} intro={c.demo.lead} layout="center" />
+      <div data-reveal="fade">
+        <PricerDemo demo={c.demo} locale={c.locale} currency={c.currency} />
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Benefits -->
+  <section class="section light px-benefits" aria-labelledby="px-benefits-title">
+    <div class="container">
+      <SectionHead id="px-benefits-title" eyebrow={c.benefits.eyebrow} title={c.benefits.title} />
+      <ul class="benefits" role="list">
+        {
+          c.benefits.items.map((b, i) => (
+            <li class="benefit" data-reveal data-spotlight>
+              <svg
+                class="benefit__icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+                set:html={benefitIcons[i]}
+              />
+              <h3 class="h3">{b.title}</h3>
+              <p class="muted">{b.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 6. Configuration -->
+  <section class="section px-config" aria-labelledby="px-config-title">
+    <div class="container px-config__inner">
+      <SectionHead id="px-config-title" eyebrow={c.config.eyebrow} title={c.config.title} intro={c.config.lead} />
+      <ul class="config" role="list">
+        {
+          c.config.items.map((item) => (
+            <li class="config__item" data-reveal>
+              <span class="config__check" aria-hidden="true">
+                <svg viewBox="0 0 16 16">
+                  <path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.6" />
+                </svg>
+              </span>
+              <span class="config__title">{item.title}</span>
+              {item.note && <span class="config__note">{item.note}</span>}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 7. Screenshots: omitted until the product screenshots are added to the repository. -->
+
+  <!-- 8. Closing CTA -->
+  <section class="section light px-closing" aria-labelledby="px-closing-title">
+    <div class="px-closing__bg" aria-hidden="true"></div>
+    <div class="container px-closing__inner">
+      <span class="px-closing__mark" aria-hidden="true" data-reveal="fade"></span>
+      <h2 class="px-closing__title" id="px-closing-title" data-reveal>{c.closing.title}</h2>
+      <p class="lead px-closing__text" data-reveal>{c.closing.text}</p>
+      <div class="px-closing__action" data-reveal>
+        <a href={contact} class="btn btn--primary btn--lg btn--block-mobile">{dict.cta.primary} <ArrowIcon /></a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- 1. Hero ---------- */
+  .px-hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding-block: clamp(3.5rem, 2rem + 6vw, 7rem) clamp(4.5rem, 3rem + 6vw, 8rem);
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .px-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 45% 55% at 85% 20%, rgb(31 140 165 / 0.13), transparent 70%),
+      radial-gradient(ellipse 30% 40% at 95% 90%, rgb(228 0 58 / 0.05), transparent 70%),
+      linear-gradient(to right, rgb(255 255 255 / 0.03) 1px, transparent 1px) 0 0 / 104px 104px,
+      linear-gradient(to bottom, rgb(255 255 255 / 0.03) 1px, transparent 1px) 0 0 / 104px 104px;
+    mask-image: radial-gradient(ellipse 85% 80% at 70% 30%, #000 25%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 85% 80% at 70% 30%, #000 25%, transparent 80%);
+  }
+
+  .px-hero__inner {
+    display: grid;
+    gap: clamp(3rem, 2rem + 4vw, 5rem);
+  }
+
+  .px-hero__content {
+    display: grid;
+    gap: 1.6rem;
+    align-content: start;
+  }
+
+  .px-hero__title {
+    font-size: clamp(2.5rem, 1.4rem + 4.6vw, 5.5rem);
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 0.98;
+    max-width: 13ch;
+    text-wrap: balance;
+  }
+
+  .px-hero__lead {
+    max-width: 52ch;
+  }
+
+  .px-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.4rem;
+  }
+
+  .px-in {
+    animation: px-in 850ms var(--ease-reveal) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 60ms);
+  }
+
+  @keyframes px-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .px-hero__inner {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      align-items: center;
+    }
+  }
+
+  /* ---------- 2. Problem ---------- */
+  .px-problem__inner {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .px-problem__head :global(.section-head) {
+    margin-bottom: 0;
+  }
+
+  .px-problem__body {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .tasks {
+    display: grid;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .task {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: baseline;
+    padding: 1.05rem 0.25rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .task__num {
+    font-size: var(--text-xs);
+    color: var(--color-teal-text);
+  }
+
+  .task__text {
+    font-size: var(--text-md);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+  }
+
+  .px-problem__closing {
+    padding: 1.25rem 1.4rem;
+    border-left: 2px solid var(--color-brand-red);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background: linear-gradient(90deg, rgb(228 0 58 / 0.07), transparent 80%);
+    font-size: var(--text-lg);
+    line-height: 1.5;
+    color: var(--color-text);
+  }
+
+  @media (min-width: 1024px) {
+    .px-problem__inner {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+      gap: clamp(3rem, 1rem + 5vw, 6rem);
+      align-items: start;
+    }
+    .px-problem__head {
+      position: sticky;
+      top: calc(var(--header-h) + 2rem);
+    }
+  }
+
+  /* ---------- 3. How it works ---------- */
+  .flow {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .flow__step {
+    position: relative;
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    padding: clamp(1.25rem, 1rem + 0.8vw, 1.6rem);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+
+  .flow__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+    min-height: 24px;
+  }
+
+  .flow__num {
+    font-size: var(--text-xs);
+    color: var(--color-brand-red);
+  }
+
+  .flow__text {
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+  }
+
+  /* Human review step stands out */
+  .flow__step--review {
+    border-color: var(--color-brand-teal);
+    background: linear-gradient(180deg, rgb(31 140 165 / 0.12), var(--color-surface) 70%);
+  }
+
+  .flow__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: rgb(31 140 165 / 0.18);
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-teal-text);
+    white-space: nowrap;
+  }
+
+  .flow__badge svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Connectors */
+  .flow__step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 1.6rem;
+    bottom: calc(-1rem - 1px);
+    width: 1px;
+    height: 1rem;
+    background: var(--color-brand-red);
+  }
+
+  @media (min-width: 640px) and (max-width: 1099px) {
+    .flow {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .flow__step:last-child {
+      grid-column: 1 / -1;
+    }
+    .flow__step::after {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .flow {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1.1rem;
+    }
+    .flow__step:not(:last-child)::after {
+      left: auto;
+      right: calc(-1.1rem - 1px);
+      top: 2.4rem;
+      bottom: auto;
+      width: 1.1rem;
+      height: 1px;
+    }
+  }
+
+  /* ---------- 4. Demo ---------- */
+  .px-demo {
+    overflow: hidden;
+  }
+
+  .px-demo__glow {
+    position: absolute;
+    left: 50%;
+    top: 30%;
+    width: min(1100px, 100%);
+    height: 60%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgb(31 140 165 / 0.12), transparent 65%);
+    pointer-events: none;
+  }
+
+  .px-demo .container {
+    position: relative;
+  }
+
+  /* ---------- 5. Benefits ---------- */
+  .benefits {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .benefit {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    border: 1px solid var(--color-light-border);
+    border-radius: var(--radius);
+    background: var(--color-light-surface);
+    transition: border-color var(--dur) var(--ease-out);
+  }
+
+  .benefit:hover {
+    border-color: var(--color-light-muted);
+  }
+
+  .benefit__icon {
+    width: 32px;
+    height: 32px;
+    color: var(--color-brand-teal);
+    margin-bottom: clamp(0.75rem, 0.4rem + 1.5vw, 2rem);
+  }
+
+  .benefit p {
+    font-size: 0.9375rem;
+  }
+
+  @media (min-width: 640px) {
+    .benefits {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .benefits {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  /* ---------- 6. Configuration ---------- */
+  .px-config__inner {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .px-config__inner :global(.section-head) {
+    margin-bottom: 0;
+  }
+
+  .config {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+  }
+
+  .config__item {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    column-gap: 0.9rem;
+    align-items: center;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+
+  .config__check {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    grid-row: span 2;
+    border-radius: 50%;
+    background: rgb(31 140 165 / 0.15);
+    color: var(--color-teal-text);
+  }
+
+  .config__check svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .config__title {
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .config__note {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 640px) {
+    .config {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .px-config__inner {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: clamp(3rem, 1rem + 5vw, 6rem);
+      align-items: center;
+    }
+  }
+
+  /* ---------- 8. Closing CTA ---------- */
+  .px-closing {
+    position: relative;
+    isolation: isolate;
+    padding-block: clamp(5rem, 3.5rem + 6vw, 9rem);
+    margin-bottom: clamp(0.5rem, 0.2rem + 1vw, 1rem);
+  }
+
+  .px-closing__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 45% 55% at 50% 0%, rgb(31 140 165 / 0.14), transparent 70%),
+      radial-gradient(ellipse 35% 45% at 50% 105%, rgb(228 0 58 / 0.08), transparent 70%),
+      radial-gradient(circle at 1px 1px, rgb(21 23 25 / 0.09) 1px, transparent 1.4px) 0 0 / 22px 22px;
+    mask-image: radial-gradient(ellipse 80% 75% at 50% 50%, #000 35%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 75% at 50% 50%, #000 35%, transparent 85%);
+  }
+
+  .px-closing__inner {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .px-closing__mark {
+    width: 44px;
+    height: 3px;
+    background: var(--color-brand-red);
+    margin-bottom: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem);
+  }
+
+  .px-closing__title {
+    font-size: clamp(2.2rem, 1.3rem + 3.8vw, 4.75rem);
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 1;
+    max-width: 18ch;
+    text-wrap: balance;
+  }
+
+  .px-closing__text {
+    max-width: 50ch;
+    margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+  }
+
+  .px-closing__action {
+    margin-top: clamp(1.75rem, 1.25rem + 1.5vw, 2.75rem);
+  }
+
+  @media (max-width: 559px) {
+    .px-closing__action {
+      width: 100%;
+    }
+  }
+</style>

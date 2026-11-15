@@ -38,7 +38,7 @@ const envIcons: IconName[] = ["cloud", "server"];
         <ul role="list" class="choose">
           {
             d.items.map((item, i) => (
-              <li class="choose__item" data-reveal data-spotlight>
+              <li class="choose__item" data-reveal>
                 <div class="choose__top">
                   <Icon name={icons[i]} class="choose__icon" />
                   <span class="mono choose__num">{String(i + 1).padStart(2, "0")}</span>
