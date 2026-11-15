@@ -8,11 +8,14 @@ interface Props {
 const d = t(Astro.props.lang).team;
 
 /**
- * TODO(content): replace placeholders with approved names, real photos
- * (e.g. /public/images/team/*.webp, square ~600×600, face roughly centred) and approved competence notes.
- * Do not add job titles that have not been confirmed.
+ * Team members (approved order). Names and role titles are the same in PL and EN.
+ * Photos are square; `position` can fine-tune the crop per person if ever needed.
  */
-const members: { name?: string; photo?: string; note?: string }[] = [{}, {}, {}];
+const members: { name?: string; photo?: string; note?: string; position?: string }[] = [
+  { name: "Jacek Cieślak", photo: "/images/team/jacek.png", note: "CEO / DevOps Platform Engineer" },
+  { name: "Dominik Choma", photo: "/images/team/dom.jpeg", note: "Data & AI/ML Architect" },
+  { name: "Mateusz Grabowski", photo: "/images/team/mat.png", note: "Data & AI Engineer" },
+];
 ---
 
 <section class="section section--rule team" id="o-nas" aria-labelledby="team-title">
@@ -43,7 +46,15 @@ const members: { name?: string; photo?: string; note?: string }[] = [{}, {}, {}]
             <li class="person" data-reveal>
               <div class="person__photo">
                 {m.photo ? (
-                  <img src={m.photo} alt={m.name ?? ""} width="600" height="600" loading="lazy" decoding="async" />
+                  <img
+                    src={m.photo}
+                    alt={m.name ?? ""}
+                    width="600"
+                    height="600"
+                    loading="lazy"
+                    decoding="async"
+                    style={m.position ? `object-position:${m.position}` : undefined}
+                  />
                 ) : (
                   <div class="person__placeholder" aria-hidden="true">
                     <svg viewBox="0 0 80 100" fill="none">
