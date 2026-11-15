@@ -1,0 +1,109 @@
+---
+/**
+ * Presents a real ArchiFlow screenshot: original image, aspect ratio preserved,
+ * subtle frame + shadow. The image links to the full-size file so details can be
+ * inspected (useful on small screens). No overlays, filters or edits.
+ */
+import { SCREENSHOTS, type ScreenshotKey } from "@/i18n/archiflow";
+
+interface Props {
+  shot: ScreenshotKey;
+  alt: string;
+  openLabel: string;
+  eager?: boolean;
+  class?: string;
+}
+const { shot, alt, openLabel, eager = false, class: className } = Astro.props;
+const s = SCREENSHOTS[shot];
+---
+
+<figure class:list={["shot", className]}>
+  <a class="shot__link" href={s.src} target="_blank" rel="noopener" aria-label={`${openLabel}: ${alt}`}>
+    <img
+      src={s.src}
+      alt={alt}
+      width={s.width}
+      height={s.height}
+      loading={eager ? "eager" : "lazy"}
+      decoding={eager ? "sync" : "async"}
+      fetchpriority={eager ? "high" : undefined}
+    />
+    <span class="shot__zoom" aria-hidden="true">
+      <svg viewBox="0 0 16 16"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg>
+    </span>
+  </a>
+</figure>
+
+<style>
+  .shot {
+    margin: 0;
+    min-width: 0;
+  }
+
+  .shot__link {
+    position: relative;
+    display: block;
+    border-radius: var(--radius);
+    padding: clamp(4px, 0.4vw, 7px);
+    background: linear-gradient(180deg, #232a2f, #161b1e);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 40px 80px -45px rgb(0 0 0 / 0.95);
+    transition:
+      border-color var(--dur) var(--ease-out),
+      transform 400ms var(--ease-out);
+  }
+
+  .shot__link:hover {
+    border-color: var(--color-text-muted);
+    transform: translateY(-2px);
+  }
+
+  .shot__link:focus-visible {
+    outline-offset: 4px;
+  }
+
+  .shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: calc(var(--radius) - 4px);
+    background: #f6f7f9;
+  }
+
+  /* Small "expand" hint — signals that the image opens at full size */
+  .shot__zoom {
+    position: absolute;
+    right: clamp(10px, 1vw, 16px);
+    bottom: clamp(10px, 1vw, 16px);
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgb(11 13 15 / 0.78);
+    color: #fff;
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+      opacity var(--dur) var(--ease-out),
+      transform var(--dur) var(--ease-out);
+  }
+
+  .shot__zoom svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .shot__link:hover .shot__zoom,
+  .shot__link:focus-visible .shot__zoom {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (hover: none) {
+    .shot__zoom {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

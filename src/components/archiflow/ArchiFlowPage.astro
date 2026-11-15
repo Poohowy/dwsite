@@ -1,0 +1,938 @@
+---
+/**
+ * ArchiFlow product landing page (PL: /archiflow/, EN: /en/archiflow/).
+ * Follows the Pricer page conventions: page-specific component + copy in
+ * src/i18n/archiflow.ts; reuses Base, SectionHead, ArrowIcon and global classes
+ * without modifying them. Real screenshots from /public/images/archiflow.
+ */
+import ArrowIcon from "@/components/ArrowIcon.astro";
+import SectionHead from "@/components/SectionHead.astro";
+import { t, type Lang } from "@/i18n";
+import { archiflowCopy } from "@/i18n/archiflow";
+import Base from "@/layouts/Base.astro";
+import Screenshot from "./Screenshot.astro";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const dict = t(lang);
+const c = archiflowCopy(lang);
+const contact = dict.routes.contact;
+const FEATURES_ID = lang === "pl" ? "mozliwosci" : "features";
+
+const problemIcons = [
+  '<path d="M4 7h7M4 12h4M4 17h6"/><rect x="13" y="4" width="7" height="6" rx="1"/><rect x="13" y="14" width="7" height="6" rx="1"/>',
+  '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/><path d="M8.5 11h5"/>',
+  '<rect x="3.5" y="5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M12 12.5v3l2 1"/>',
+  '<circle cx="9" cy="8" r="3"/><path d="M3.5 19c.6-3 2.8-4.8 5.5-4.8s4.9 1.8 5.5 4.8"/><path d="M17 7v6M17 16v.5"/>',
+  '<path d="M4 5.5h16v10H9l-5 4z"/><path d="M11 9.2a1.5 1.5 0 1 1 1.8 1.5c-.5.1-.8.5-.8 1v.3M12 14v.3"/>',
+];
+const overviewIcons = [
+  '<rect x="3.5" y="4" width="17" height="16" rx="1.5"/><path d="M8 15v-3M12 15V9M16 15v-5"/>',
+  '<path d="M12 4 3 19.5h18z"/><path d="M12 10v4.5M12 17v.3"/>',
+  '<rect x="3.5" y="5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>',
+  '<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 8 8h-8z"/>',
+  '<path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v3.5h3.5"/><path d="M12 8v4.5l3 2"/>',
+];
+---
+
+<Base lang={lang} page="archiflow" title={c.meta.title} description={c.meta.description}>
+  <!-- 1. Hero -->
+  <section class="ax-hero" aria-labelledby="archiflow-title">
+    <div class="ax-hero__bg" aria-hidden="true"></div>
+    <div class="container">
+      <div class="ax-hero__content">
+        <p class="eyebrow ax-in" style="--i:0">{c.hero.eyebrow}</p>
+        <h1 class="ax-hero__title ax-in" id="archiflow-title" style="--i:1">
+          {c.hero.title.replace(/\.$/, "")}<span class="accent">.</span>
+        </h1>
+        <div class="ax-hero__side ax-in" style="--i:2">
+          <p class="lead">{c.hero.lead}</p>
+          <div class="ax-hero__actions">
+            <a href={contact} class="btn btn--primary btn--block-mobile">{dict.cta.primary} <ArrowIcon /></a>
+            <a href={`#${FEATURES_ID}`} class="btn btn--ghost btn--block-mobile">
+              {c.hero.secondary} <ArrowIcon direction="down" />
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="ax-hero__shot ax-in" style="--i:3">
+        <Screenshot shot="dashboard" alt={c.hero.shotAlt} openLabel={c.modules.openFull} eager />
+        <p class="ax-note mono">{c.screenshotNote}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Problem -->
+  <section class="section section--surface" aria-labelledby="ax-problem-title">
+    <div class="container">
+      <SectionHead id="ax-problem-title" eyebrow={c.problem.eyebrow} title={c.problem.title} intro={c.problem.intro} split />
+      <ul class="problems" role="list">
+        {
+          c.problem.items.map((p, i) => (
+            <li class="problem" data-reveal>
+              <svg
+                class="problem__icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+                set:html={problemIcons[i]}
+              />
+              <h3 class="h3">{p.title}</h3>
+              <p class="problem__text">{p.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 3. Central overview (business value of the dashboard; screenshot not repeated) -->
+  <section class="section section--rule ax-overview" aria-labelledby="ax-overview-title">
+    <div class="container ax-overview__inner">
+      <SectionHead id="ax-overview-title" eyebrow={c.overview.eyebrow} title={c.overview.title} intro={c.overview.text} />
+      <ul class="overview" role="list">
+        {
+          c.overview.items.map((o, i) => (
+            <li class="overview__item" data-reveal>
+              <span class="overview__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" set:html={overviewIcons[i]} />
+              </span>
+              <span class="overview__body">
+                <span class="overview__title">{o.title}</span>
+                <span class="overview__text">{o.text}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4. Product modules (alternating text / screenshot) -->
+  <section class="section section--surface ax-modules" id={FEATURES_ID} aria-labelledby="ax-modules-title">
+    <div class="container">
+      <SectionHead id="ax-modules-title" eyebrow={c.modules.eyebrow} title={c.modules.title} layout="center" />
+      <div class="modules">
+        {
+          c.modules.items.map((m, i) => (
+            <article class:list={["module", { "module--reverse": i % 2 === 1 }]} aria-labelledby={`ax-module-${i}`}>
+              <div class="module__text" data-reveal>
+                <p class="module__label mono">
+                  <span class="module__num">{String(i + 1).padStart(2, "0")}</span>
+                  {m.label}
+                </p>
+                <h3 class="module__title" id={`ax-module-${i}`}>
+                  {m.title}
+                </h3>
+                <p class="module__copy">{m.text}</p>
+              </div>
+              <div class="module__visual" data-reveal="scale">
+                {m.shot && m.alt && <Screenshot shot={m.shot} alt={m.alt} openLabel={c.modules.openFull} />}
+                {m.record && (
+                  <div class="record">
+                    <div class="record__head">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                        <path d="M6 3.5h8l4 4V20.5H6z" />
+                        <path d="M14 3.5v4h4M9 12h6M9 15.5h6" />
+                      </svg>
+                      <span class="record__title">{m.record.title}</span>
+                    </div>
+                    <ul class="record__list" role="list">
+                      {m.record.items.map((item, j) => (
+                        <li>
+                          <span class="record__idx mono">{String(j + 1).padStart(2, "0")}</span>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Client portal -->
+  <section class="section ax-portal" aria-labelledby="ax-portal-title">
+    <div class="container">
+      <SectionHead id="ax-portal-title" eyebrow={c.portal.eyebrow} title={c.portal.title} intro={c.portal.text} split />
+
+      <figure class="portal" aria-label={c.portal.diagramLabel} data-reveal>
+        <div class="portal__node">
+          <span class="portal__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 20.5V9l8-5 8 5v11.5" /><path d="M9.5 20.5v-6h5v6" />
+            </svg>
+          </span>
+          <span class="portal__name">{c.portal.practice.title}</span>
+          <span class="portal__text">{c.portal.practice.text}</span>
+        </div>
+        <span class="portal__link" aria-hidden="true"><i></i></span>
+        <div class="portal__node portal__node--hub">
+          <span class="portal__hub-mark" aria-hidden="true"></span>
+          <span class="portal__name">{c.portal.hub}</span>
+        </div>
+        <span class="portal__link" aria-hidden="true"><i></i></span>
+        <div class="portal__node portal__node--client">
+          <span class="portal__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="8" r="3.5" /><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" />
+            </svg>
+          </span>
+          <span class="portal__name">{c.portal.client.title}</span>
+          <span class="portal__text">{c.portal.client.text}</span>
+        </div>
+      </figure>
+
+      <div class="portal__details">
+        <div class="portal__list" data-reveal>
+          <p class="portal__list-title">{c.portal.listTitle}</p>
+          <ul role="list">
+            {
+              c.portal.items.map((item) => (
+                <li>
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.6" />
+                  </svg>
+                  {item}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <p class="portal__benefit" data-reveal>{c.portal.benefit}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Business benefits -->
+  <section class="section light ax-benefits" aria-labelledby="ax-benefits-title">
+    <div class="container">
+      <SectionHead id="ax-benefits-title" eyebrow={c.benefits.eyebrow} title={c.benefits.title} />
+      <ol class="benefits" role="list">
+        {
+          c.benefits.items.map((b, i) => (
+            <li class="benefit" data-reveal>
+              <span class="benefit__num mono">{String(i + 1).padStart(2, "0")}</span>
+              <span class="benefit__text">{b}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- 7. Product development -->
+  <section class="section ax-growth" aria-labelledby="ax-growth-title">
+    <div class="container ax-growth__inner" data-reveal>
+      <div class="ax-growth__mark" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div>
+        <p class="eyebrow">{c.growth.eyebrow}</p>
+        <h2 class="ax-growth__title" id="ax-growth-title">{c.growth.title}</h2>
+        <p class="lead ax-growth__text">{c.growth.text}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Closing CTA -->
+  <section class="section light ax-closing" aria-labelledby="ax-closing-title">
+    <div class="ax-closing__bg" aria-hidden="true"></div>
+    <div class="container ax-closing__inner">
+      <span class="ax-closing__mark" aria-hidden="true" data-reveal="fade"></span>
+      <h2 class="ax-closing__title" id="ax-closing-title" data-reveal>{c.closing.title}</h2>
+      <p class="lead ax-closing__text" data-reveal>{c.closing.text}</p>
+      <div class="ax-closing__action" data-reveal>
+        <a href={contact} class="btn btn--primary btn--lg btn--block-mobile">{dict.cta.primary} <ArrowIcon /></a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- 1. Hero ---------- */
+  .ax-hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding-block: clamp(3.5rem, 2rem + 6vw, 7rem) clamp(4rem, 3rem + 5vw, 7rem);
+  }
+
+  .ax-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 55% 45% at 50% 70%, rgb(31 140 165 / 0.16), transparent 70%),
+      radial-gradient(ellipse 30% 30% at 90% 15%, rgb(228 0 58 / 0.05), transparent 70%),
+      linear-gradient(to right, rgb(255 255 255 / 0.03) 1px, transparent 1px) 0 0 / 104px 104px,
+      linear-gradient(to bottom, rgb(255 255 255 / 0.03) 1px, transparent 1px) 0 0 / 104px 104px;
+    mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, #000 30%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, #000 30%, transparent 85%);
+  }
+
+  .ax-hero__content {
+    display: grid;
+    gap: 1.6rem;
+  }
+
+  .ax-hero__title {
+    font-size: clamp(2.5rem, 1.4rem + 4.6vw, 5.5rem);
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 0.98;
+    max-width: 15ch;
+    text-wrap: balance;
+  }
+
+  .ax-hero__side {
+    display: grid;
+    gap: 1.5rem;
+    align-content: end;
+  }
+
+  .ax-hero__side .lead {
+    max-width: 52ch;
+  }
+
+  .ax-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .ax-hero__shot {
+    margin-top: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+  }
+
+  .ax-note {
+    margin-top: 0.85rem;
+    text-align: right;
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .ax-in {
+    animation: ax-in 850ms var(--ease-reveal) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 60ms);
+  }
+
+  @keyframes ax-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .ax-hero__content {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      column-gap: 4rem;
+      align-items: end;
+    }
+    .ax-hero__content .eyebrow {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* ---------- 2. Problem ---------- */
+  .problems {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .problem {
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding: clamp(1.4rem, 1.1rem + 1vw, 1.9rem);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+  }
+
+  .problem__icon {
+    width: 30px;
+    height: 30px;
+    color: var(--color-teal-text);
+    margin-bottom: clamp(0.5rem, 0.3rem + 1vw, 1.5rem);
+  }
+
+  .problem__text {
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+  }
+
+  @media (min-width: 640px) {
+    .problems {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .problems {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .problem {
+      grid-column: span 2;
+    }
+    /* 3 + 2 composition: the last two cards share the second row evenly */
+    .problem:nth-child(4),
+    .problem:nth-child(5) {
+      grid-column: span 3;
+    }
+  }
+
+  /* ---------- 3. Overview ---------- */
+  .ax-overview__inner {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .ax-overview__inner :global(.section-head) {
+    margin-bottom: 0;
+  }
+
+  .overview {
+    display: grid;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .overview__item {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    padding-block: 1.1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .overview__icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-teal-text);
+  }
+
+  .overview__icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .overview__body {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .overview__title {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .overview__text {
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 1024px) {
+    .ax-overview__inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(3rem, 1rem + 5vw, 6rem);
+      align-items: center;
+    }
+  }
+
+  /* ---------- 4. Modules ---------- */
+  .modules {
+    display: grid;
+    gap: clamp(4rem, 3rem + 4vw, 7.5rem);
+  }
+
+  .module {
+    display: grid;
+    gap: clamp(1.75rem, 1.25rem + 2vw, 2.5rem);
+    align-items: center;
+  }
+
+  .module__text {
+    display: grid;
+    gap: 1rem;
+    align-content: center;
+    max-width: 46ch;
+  }
+
+  .module__label {
+    display: inline-flex;
+    gap: 0.6rem;
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .module__num {
+    color: var(--color-brand-red);
+  }
+
+  .module__title {
+    font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.6rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  .module__copy {
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+    line-height: 1.6;
+  }
+
+  .module__visual {
+    min-width: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .module {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      gap: clamp(2.5rem, 1rem + 3vw, 4.5rem);
+    }
+    .module--reverse {
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    }
+    .module--reverse .module__text {
+      order: 2;
+    }
+  }
+
+  /* Project record (text-based composition — not an interface mock-up) */
+  .record {
+    max-width: 560px;
+    margin-inline: auto;
+    padding: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(ellipse 60% 80% at 100% 0, rgb(31 140 165 / 0.1), transparent 60%),
+      var(--color-bg);
+  }
+
+  .record__head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .record__head svg {
+    width: 24px;
+    height: 24px;
+    color: var(--color-teal-text);
+  }
+
+  .record__title {
+    font-weight: 600;
+    font-size: var(--text-h3);
+    letter-spacing: -0.015em;
+  }
+
+  .record__list li {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    align-items: baseline;
+    padding: 0.8rem 0;
+    border-bottom: 1px dashed var(--color-border);
+    color: var(--color-text);
+  }
+
+  .record__list li:last-child {
+    border-bottom: 0;
+  }
+
+  .record__idx {
+    font-size: var(--text-xs);
+    color: var(--color-brand-red);
+  }
+
+  /* ---------- 5. Client portal ---------- */
+  .portal {
+    display: grid;
+    gap: 0;
+    justify-items: center;
+    margin: 0 0 clamp(2rem, 1.5rem + 2vw, 3rem);
+  }
+
+  .portal__node {
+    display: grid;
+    justify-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    max-width: 320px;
+    padding: 1.5rem 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    text-align: center;
+  }
+
+  .portal__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 0.4rem;
+    border-radius: 50%;
+    background: rgb(31 140 165 / 0.14);
+    color: var(--color-teal-text);
+  }
+
+  .portal__icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .portal__name {
+    font-weight: 600;
+    font-size: var(--text-h3);
+    letter-spacing: -0.015em;
+  }
+
+  .portal__text {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    max-width: 26ch;
+  }
+
+  .portal__node--hub {
+    max-width: 200px;
+    padding: 1.1rem 1.25rem;
+    border-color: var(--color-brand-teal);
+    background: linear-gradient(180deg, rgb(31 140 165 / 0.18), var(--color-surface));
+  }
+
+  .portal__hub-mark {
+    width: 12px;
+    height: 12px;
+    background: var(--color-brand-red);
+    box-shadow: 0 0 0 5px rgb(228 0 58 / 0.15);
+    margin-bottom: 0.25rem;
+  }
+
+  /* Two-way connectors */
+  .portal__link {
+    position: relative;
+    display: block;
+    width: 1px;
+    height: 2.75rem;
+    background: var(--color-border);
+  }
+
+  .portal__link::before,
+  .portal__link::after {
+    content: "";
+    position: absolute;
+    left: -3px;
+    width: 7px;
+    height: 7px;
+    border-left: 1px solid var(--color-text-muted);
+    border-top: 1px solid var(--color-text-muted);
+  }
+
+  .portal__link::before {
+    top: 0;
+    transform: rotate(45deg);
+  }
+
+  .portal__link::after {
+    bottom: 0;
+    transform: rotate(225deg);
+  }
+
+  .portal__link i {
+    position: absolute;
+    left: -2px;
+    top: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-teal-text);
+    animation: portal-v 3.2s ease-in-out infinite alternate;
+  }
+
+  @keyframes portal-v {
+    from {
+      top: 10%;
+    }
+    to {
+      top: 80%;
+    }
+  }
+
+  .portal__details {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 960px;
+    margin-inline: auto;
+  }
+
+  .portal__list {
+    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .portal__list-title {
+    font-weight: 600;
+    margin-bottom: 0.9rem;
+  }
+
+  .portal__list ul {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .portal__list li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    color: var(--color-text);
+  }
+
+  .portal__list svg {
+    width: 14px;
+    height: 14px;
+    flex: none;
+    color: var(--color-teal-text);
+    transform: translateY(2px);
+  }
+
+  .portal__benefit {
+    align-self: center;
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--color-brand-red);
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  @media (min-width: 900px) {
+    .portal {
+      grid-template-columns: minmax(0, 1fr) minmax(3rem, 6rem) auto minmax(3rem, 6rem) minmax(0, 1fr);
+      align-items: center;
+      max-width: 1040px;
+      margin-inline: auto;
+    }
+    .portal__node {
+      max-width: none;
+    }
+    .portal__link {
+      width: 100%;
+      height: 1px;
+    }
+    .portal__link::before {
+      top: -3px;
+      left: 0;
+      transform: rotate(-45deg);
+    }
+    .portal__link::after {
+      top: -3px;
+      bottom: auto;
+      left: auto;
+      right: 0;
+      transform: rotate(135deg);
+    }
+    .portal__link i {
+      top: -2px;
+      animation-name: portal-h;
+    }
+    @keyframes portal-h {
+      from {
+        left: 10%;
+      }
+      to {
+        left: 85%;
+      }
+    }
+    .portal__details {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: clamp(2rem, 1rem + 3vw, 4rem);
+    }
+  }
+
+  /* ---------- 6. Benefits ---------- */
+  .benefits {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .benefit {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+    padding: clamp(1.4rem, 1.1rem + 1vw, 1.9rem);
+    border: 1px solid var(--color-light-border);
+    border-radius: var(--radius);
+    background: var(--color-light-surface);
+  }
+
+  .benefit__num {
+    font-size: var(--text-xs);
+    color: var(--color-brand-red);
+  }
+
+  .benefit__text {
+    font-size: var(--text-md);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+  }
+
+  @media (min-width: 640px) {
+    .benefits {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .benefits {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* ---------- 7. Growth ---------- */
+  .ax-growth__inner {
+    display: grid;
+    gap: 2rem;
+    max-width: 1000px;
+  }
+
+  .ax-growth__title {
+    margin-top: 1rem;
+    font-size: clamp(1.9rem, 1.3rem + 2.4vw, 3.25rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    max-width: 20ch;
+    text-wrap: balance;
+  }
+
+  .ax-growth__text {
+    margin-top: 1.25rem;
+    max-width: 60ch;
+  }
+
+  /* Ascending steps — a quiet "growing" motif */
+  .ax-growth__mark {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 48px;
+  }
+
+  .ax-growth__mark i {
+    width: 10px;
+    border-radius: 2px;
+    background: var(--color-border);
+  }
+
+  .ax-growth__mark i:nth-child(1) {
+    height: 35%;
+  }
+  .ax-growth__mark i:nth-child(2) {
+    height: 65%;
+  }
+  .ax-growth__mark i:nth-child(3) {
+    height: 100%;
+    background: var(--color-brand-teal);
+  }
+
+  @media (min-width: 900px) {
+    .ax-growth__inner {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 3rem;
+      align-items: start;
+    }
+    .ax-growth__mark {
+      margin-top: 0.4rem;
+    }
+  }
+
+  /* ---------- 8. Closing CTA ---------- */
+  .ax-closing {
+    position: relative;
+    isolation: isolate;
+    padding-block: clamp(5rem, 3.5rem + 6vw, 9rem);
+    margin-bottom: clamp(0.5rem, 0.2rem + 1vw, 1rem);
+  }
+
+  .ax-closing__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 45% 55% at 50% 0%, rgb(31 140 165 / 0.14), transparent 70%),
+      radial-gradient(ellipse 35% 45% at 50% 105%, rgb(228 0 58 / 0.08), transparent 70%),
+      radial-gradient(circle at 1px 1px, rgb(21 23 25 / 0.09) 1px, transparent 1.4px) 0 0 / 22px 22px;
+    mask-image: radial-gradient(ellipse 80% 75% at 50% 50%, #000 35%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 75% at 50% 50%, #000 35%, transparent 85%);
+  }
+
+  .ax-closing__inner {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .ax-closing__mark {
+    width: 44px;
+    height: 3px;
+    background: var(--color-brand-red);
+    margin-bottom: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem);
+  }
+
+  .ax-closing__title {
+    font-size: clamp(2.2rem, 1.3rem + 3.8vw, 4.75rem);
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 1;
+    max-width: 18ch;
+    text-wrap: balance;
+  }
+
+  .ax-closing__text {
+    max-width: 50ch;
+    margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+  }
+
+  .ax-closing__action {
+    margin-top: clamp(1.75rem, 1.25rem + 1.5vw, 2.75rem);
+  }
+
+  @media (max-width: 559px) {
+    .ax-closing__action {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .portal__link i {
+      display: none;
+    }
+  }
+</style>
