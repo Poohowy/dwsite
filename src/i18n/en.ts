@@ -102,7 +102,7 @@ export const en: Dictionary = {
   },
   solutions: {
     eyebrow: "03 / Our approach",
-    title: "We don't start with technology. We start with the problem.",
+    title: "First, we get to know your business. Then we find the right solution.",
     intro:
       "Every company works differently. That's why we first learn how you work and look for the place where something can be simplified. Only then do we choose a solution — one that makes sense both for the business and technically.",
     items: [

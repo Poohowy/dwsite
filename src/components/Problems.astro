@@ -10,11 +10,11 @@ const d = t(Astro.props.lang).problems;
 
 <section class="section section--surface problems" aria-labelledby="problems-title">
   <div class="container">
-    <SectionHead id="problems-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} split />
+    <SectionHead id="problems-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} layout="columns" size="lg" />
     <ol role="list" class="problems__grid">
       {
         d.items.map((item, i) => (
-          <li class="problem" data-reveal style={`--reveal-delay:${(i % 4) * 60}ms`}>
+          <li class="problem" data-reveal data-spotlight>
             <span class="problem__num mono">{String(i + 1).padStart(2, "0")}</span>
             <h3 class="h3 problem__title">{item.title}</h3>
             <p class="problem__text">{item.text}</p>
@@ -86,6 +86,10 @@ const d = t(Astro.props.lang).problems;
   @media (min-width: 1100px) {
     .problems__grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    /* Grid breaks slightly out of the content column for a wider, more open composition */
+    .problems__grid {
+      margin-inline: calc(var(--gutter) * -0.5);
     }
     .problem {
       min-height: 280px;

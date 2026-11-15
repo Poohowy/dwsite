@@ -12,13 +12,13 @@ const icons: IconName[] = ["cloud", "server", "flow", "blocks"];
 ---
 
 <section class="section light capabilities" aria-labelledby="capabilities-title">
-  <div class="container">
-    <SectionHead id="capabilities-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} split />
+  <div class="container cap__layout">
+    <SectionHead id="capabilities-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} />
 
     <ul role="list" class="cap__grid">
       {
         d.items.map((item, i) => (
-          <li class="cap" data-reveal style={`--reveal-delay:${i * 60}ms`}>
+          <li class="cap" data-reveal>
             <Icon name={icons[i]} class="cap__icon" />
             <div class="cap__body">
               <h3 class="h3">{item.title}</h3>
@@ -84,10 +84,36 @@ const icons: IconName[] = ["cloud", "server", "flow", "blocks"];
     color: var(--color-light-muted);
   }
 
-  @media (min-width: 800px) {
-    .cap__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: clamp(2rem, 1rem + 4vw, 5rem);
+  .cap__body {
+    transition: transform 400ms var(--ease-out);
+  }
+
+  .cap:hover .cap__body {
+    transform: translateX(6px);
+  }
+
+  .cap:hover :global(.cap__icon) {
+    color: var(--color-brand-red);
+  }
+
+  .cap :global(.cap__icon) {
+    transition: color 300ms var(--ease-out);
+  }
+
+  @media (min-width: 1024px) {
+    .cap__layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.25fr);
+      gap: clamp(3rem, 1rem + 5vw, 7rem);
+      align-items: start;
+    }
+    .cap__layout :global(.section-head) {
+      position: sticky;
+      top: calc(var(--header-h) + 2.5rem);
+      margin-bottom: 0;
+    }
+    .cap {
+      grid-template-columns: 56px minmax(0, 1fr);
     }
   }
 </style>

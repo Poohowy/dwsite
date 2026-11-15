@@ -10,13 +10,13 @@ const dict = t(Astro.props.lang);
 const d = dict.products;
 ---
 
-<section class="section products" aria-labelledby="products-title">
+<section class="section section--rule products" aria-labelledby="products-title">
   <div class="container">
     <SectionHead id="products-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} split />
 
     <div class="products__list">
       <!-- Pricer -->
-      <article class="product" aria-labelledby="pricer-title" data-reveal>
+      <article class="product" aria-labelledby="pricer-title" data-reveal="fade">
         <div class="product__body">
           <span class="badge">{d.pricer.status}</span>
           <h3 class="product__name" id="pricer-title">{d.pricer.name}</h3>
@@ -27,7 +27,7 @@ const d = dict.products;
           </a>
         </div>
 
-        <figure class="product__visual" aria-hidden="true">
+        <figure class="product__visual" aria-hidden="true" data-reveal="scale">
           <div class="mock mock--pricer">
             <div class="mock-card mock-mail">
               <p class="mock-label mono">{d.pricer.mock.inbox}</p>
@@ -63,7 +63,7 @@ const d = dict.products;
       </article>
 
       <!-- ArchiFlow -->
-      <article class="product product--reverse" aria-labelledby="archiflow-title" data-reveal>
+      <article class="product product--reverse" aria-labelledby="archiflow-title" data-reveal="fade">
         <div class="product__body">
           <span class="badge" style="--badge-dot: var(--color-text-muted)">{d.archiflow.status}</span>
           <h3 class="product__name" id="archiflow-title">{d.archiflow.name}</h3>
@@ -74,7 +74,7 @@ const d = dict.products;
           </a>
         </div>
 
-        <figure class="product__visual" aria-hidden="true">
+        <figure class="product__visual" aria-hidden="true" data-reveal="scale">
           <div class="mock mock--board">
             {
               d.archiflow.mock.columns.map((col, i) => (
@@ -99,10 +99,6 @@ const d = dict.products;
 </section>
 
 <style>
-  .products {
-    border-top: 1px solid var(--color-border-soft);
-  }
-
   .products__list {
     display: grid;
     gap: 1.5rem;

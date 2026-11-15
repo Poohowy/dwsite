@@ -1,5 +1,6 @@
 ---
 import ArrowIcon from "@/components/ArrowIcon.astro";
+import HeroParticles from "@/components/HeroParticles.astro";
 import { processAnchor, t, type Lang } from "@/i18n";
 
 interface Props {
@@ -11,18 +12,18 @@ const h = d.hero;
 ---
 
 <section class="hero" aria-labelledby="hero-title">
-  <div class="hero__grid-bg" aria-hidden="true"></div>
+  <HeroParticles />
   <div class="container hero__inner">
     <div class="hero__content">
       <p class="eyebrow hero__in" style="--i:0">{h.eyebrow}</p>
-      <h1 class="h1 hero__title hero__in" id="hero-title" style="--i:1">
-        <span class="hero__line">{h.titleLine1}</span>
-        <span class="hero__line">
+      <h1 class="h1 hero__title" id="hero-title">
+        <span class="hero__line hero__in" style="--i:1">{h.titleLine1}</span>
+        <span class="hero__line hero__in" style="--i:2">
           {h.titleLine2.replace(/\.$/, "")}<span class="accent">.</span>
         </span>
       </h1>
-      <p class="lead hero__lead hero__in" style="--i:2">{h.lead}</p>
-      <div class="hero__actions hero__in" style="--i:3">
+      <p class="lead hero__lead hero__in" style="--i:3">{h.lead}</p>
+      <div class="hero__actions hero__in" style="--i:4">
         <a href={d.routes.contact} class="btn btn--primary btn--block-mobile">
           {d.cta.primary}
           <ArrowIcon />
@@ -34,54 +35,58 @@ const h = d.hero;
       </div>
     </div>
 
-    <figure class="schema hero__in" style="--i:4" aria-label={h.diagram.label}>
+    <figure class="schema hero__in" style="--i:5" aria-label={h.diagram.label} data-schema>
       <div class="schema__head mono">
         <span>{h.diagram.problemsLabel}</span>
         <span class="schema__head-arrow" aria-hidden="true">→</span>
         <span>{h.diagram.solutionsLabel}</span>
       </div>
-      <div class="schema__body">
+      <div class="schema__body" data-schema-body>
         <ul role="list" class="schema__col schema__col--in">
-          {h.diagram.problems.map((p) => <li class="schema__chip">{p}</li>)}
+          {h.diagram.problems.map((p) => <li class="schema__chip" data-problem>{p}</li>)}
         </ul>
         <div class="schema__hub" aria-hidden="true">
-          <span class="schema__node"></span>
+          <span class="schema__node" data-schema-node></span>
         </div>
         <ul role="list" class="schema__col schema__col--out">
-          {h.diagram.solutions.map((s) => <li class="schema__chip schema__chip--solution">{s}</li>)}
+          {h.diagram.solutions.map((s) => <li class="schema__chip schema__chip--solution" data-solution>{s}</li>)}
         </ul>
       </div>
-      <figcaption class="schema__note mono">{h.diagram.note}</figcaption>
+      <figcaption class="schema__note mono">
+        <span class="schema__note-dot" aria-hidden="true"></span>
+        {h.diagram.note}
+      </figcaption>
     </figure>
   </div>
+  <div class="hero__fade" aria-hidden="true"></div>
 </section>
 
 <style>
   .hero {
     position: relative;
     overflow: hidden;
-    padding-top: clamp(3.5rem, 2rem + 6vw, 7.5rem);
+    isolation: isolate;
     padding-bottom: clamp(4.5rem, 3rem + 6vw, 8.5rem);
-    border-bottom: 1px solid var(--color-border-soft);
-  }
-
-  /* Faint technical grid, fading out — a detail, not a decoration. */
-  .hero__grid-bg {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(to right, rgb(255 255 255 / 0.035) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(255 255 255 / 0.035) 1px, transparent 1px);
-    background-size: 72px 72px;
-    mask-image: radial-gradient(ellipse 80% 70% at 70% 30%, #000 20%, transparent 75%);
-    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 70% 30%, #000 20%, transparent 75%);
-    pointer-events: none;
+    /* Pull the hero up behind the sticky header so the dot field fills the first screen */
+    margin-top: calc(var(--header-h) * -1);
+    padding-top: calc(var(--header-h) + clamp(3.5rem, 2rem + 6vw, 7.5rem));
   }
 
   .hero__inner {
     position: relative;
+    z-index: 1;
     display: grid;
     gap: clamp(3rem, 2rem + 4vw, 5rem);
+  }
+
+  /* Soft bottom edge into the next section instead of a hard border */
+  .hero__fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-border) 20%, var(--color-border) 80%, transparent);
   }
 
   .hero__content {
@@ -115,26 +120,40 @@ const h = d.hero;
 
   /* Entrance: subtle and fast, never blocks reading. */
   .hero__in {
-    animation: hero-in 800ms var(--ease-out) both;
-    animation-delay: calc(var(--i, 0) * 90ms);
+    animation: hero-in 900ms var(--ease-reveal) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 60ms);
   }
 
   @keyframes hero-in {
     from {
       opacity: 0;
-      transform: translateY(14px);
+      transform: translateY(16px);
     }
   }
 
-  /* Schema: problem → hub → solution */
+  /* ================= Schema: problem → hub → solution ================= */
   .schema {
+    position: relative;
     align-self: center;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    background: linear-gradient(180deg, var(--color-surface) 0%, rgb(18 22 25 / 0.6) 100%);
+    /* Opaque enough to keep labels readable over the dot field; no backdrop-filter (costly over a canvas) */
+    background: linear-gradient(180deg, rgb(18 22 25 / 0.96) 0%, rgb(14 17 19 / 0.9) 100%);
     padding: clamp(1rem, 0.6rem + 1.5vw, 1.5rem);
     max-width: 560px;
     width: 100%;
+    box-shadow: 0 30px 80px -40px rgb(0 0 0 / 0.8);
+  }
+
+  /* Hairline highlight on the top edge — light catching the panel */
+  .schema::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(79 179 203 / 0.55), transparent);
   }
 
   .schema__head {
@@ -155,8 +174,9 @@ const h = d.hero;
   }
 
   .schema__body {
+    position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) clamp(44px, 7vw, 72px) minmax(0, 1fr);
     align-items: center;
   }
 
@@ -164,6 +184,7 @@ const h = d.hero;
     display: grid;
     gap: 0.6rem;
     position: relative;
+    z-index: 1;
   }
 
   .schema__chip {
@@ -174,10 +195,33 @@ const h = d.hero;
     background: var(--color-bg);
     font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.875rem);
     line-height: 1.3;
+    color: var(--color-text-muted);
+    cursor: default;
+    transition:
+      border-color 450ms var(--ease-out),
+      color 450ms var(--ease-out),
+      background-color 450ms var(--ease-out),
+      box-shadow 450ms var(--ease-out);
+  }
+
+  .schema__chip--solution {
+    font-weight: 500;
     color: var(--color-text);
   }
 
-  /* Horizontal connectors toward the hub */
+  .schema__chip:global(.is-active) {
+    border-color: rgb(243 244 244 / 0.45);
+    color: var(--color-text);
+    background: var(--color-surface-raised);
+  }
+
+  .schema__chip--solution:global(.is-active) {
+    border-color: var(--color-brand-teal);
+    color: var(--color-teal-text);
+    box-shadow: inset 2px 0 0 var(--color-brand-teal);
+  }
+
+  /* --- Static CSS connectors (no-JS fallback) --- */
   .schema__col--in .schema__chip::after,
   .schema__col--out .schema__chip::before {
     content: "";
@@ -193,8 +237,6 @@ const h = d.hero;
   .schema__col--out .schema__chip::before {
     right: 100%;
   }
-
-  /* Vertical bus lines */
   .schema__col--in::after,
   .schema__col--out::before {
     content: "";
@@ -210,22 +252,71 @@ const h = d.hero;
   .schema__col--out::before {
     left: -22px;
   }
+  .schema__hub::before {
+    content: "";
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    top: 50%;
+    height: 1px;
+    background: var(--color-brand-red);
+  }
 
+  /* With JS: the SVG layer replaces the static connectors */
+  .schema[data-enhanced] .schema__col::before,
+  .schema[data-enhanced] .schema__col::after,
+  .schema[data-enhanced] .schema__chip::before,
+  .schema[data-enhanced] .schema__chip::after,
+  .schema[data-enhanced] .schema__hub::before {
+    display: none;
+  }
+
+  .schema__body :global(.schema__links) {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .schema__body :global(.schema__link) {
+    fill: none;
+    stroke: var(--color-border);
+    stroke-width: 1;
+    transition:
+      stroke 500ms var(--ease-out),
+      opacity 500ms var(--ease-out);
+  }
+
+  .schema__body :global(.schema__link--in.is-active) {
+    stroke: rgb(243 244 244 / 0.5);
+  }
+
+  .schema__body :global(.schema__link--out.is-active) {
+    stroke: var(--color-brand-teal);
+  }
+
+  .schema__body :global(.schema__spark) {
+    opacity: 0;
+    transition: opacity 200ms linear;
+  }
+  .schema__body :global(.schema__spark--in) {
+    fill: var(--color-text);
+  }
+  .schema__body :global(.schema__spark--out) {
+    fill: var(--color-teal-text);
+  }
+  .schema__body :global(.schema__spark.is-active) {
+    opacity: 1;
+  }
+
+  /* Hub */
   .schema__hub {
     display: grid;
     place-items: center;
     height: 100%;
     position: relative;
-  }
-
-  .schema__hub::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    height: 1px;
-    background: var(--color-brand-red);
+    z-index: 1;
   }
 
   .schema__node {
@@ -236,35 +327,51 @@ const h = d.hero;
     box-shadow: 0 0 0 5px var(--color-surface);
   }
 
-  .schema__chip--solution {
-    font-weight: 500;
-    animation: chip-active 8s var(--ease-out) infinite;
-  }
-  .schema__chip--solution:nth-child(2) {
-    animation-delay: 2s;
-  }
-  .schema__chip--solution:nth-child(3) {
-    animation-delay: 4s;
-  }
-  .schema__chip--solution:nth-child(4) {
-    animation-delay: 6s;
+  /* Gentle idle breathing ring + stronger pulse when a signal arrives */
+  .schema__node::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border: 1px solid var(--color-brand-red);
+    opacity: 0;
+    animation: node-breathe 3.6s var(--ease-out) infinite;
   }
 
-  @keyframes chip-active {
-    0%,
-    30%,
-    100% {
-      border-color: var(--color-border);
-      color: var(--color-text);
+  .schema__node:global(.is-pulsing)::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border: 1px solid var(--color-brand-red);
+    animation: node-pulse 900ms var(--ease-out) both;
+  }
+
+  @keyframes node-breathe {
+    0% {
+      transform: scale(1);
+      opacity: 0.45;
     }
-    6%,
-    22% {
-      border-color: var(--color-brand-teal);
-      color: var(--color-teal-text);
+    70%,
+    100% {
+      transform: scale(2.1);
+      opacity: 0;
+    }
+  }
+
+  @keyframes node-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    100% {
+      transform: scale(2.8);
+      opacity: 0;
     }
   }
 
   .schema__note {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
     margin-top: 1.25rem;
     padding-top: 1rem;
     border-top: 1px dashed var(--color-border);
@@ -272,6 +379,20 @@ const h = d.hero;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-text-muted);
+  }
+
+  .schema__note-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-brand-teal);
+    animation: note-blink 2.4s ease-in-out infinite;
+  }
+
+  @keyframes note-blink {
+    50% {
+      opacity: 0.25;
+    }
   }
 
   @media (min-width: 1024px) {
@@ -283,4 +404,16 @@ const h = d.hero;
       justify-self: end;
     }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .schema__node::after,
+    .schema__note-dot {
+      animation: none;
+    }
+  }
 </style>
+
+<script>
+  import { initSchema } from "@/scripts/schema";
+  document.querySelectorAll<HTMLElement>("[data-schema]").forEach(initSchema);
+</script>

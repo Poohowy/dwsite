@@ -1,17 +1,30 @@
 ---
+/**
+ * Section heading block. Layout variants give sections a different rhythm
+ * while sharing one design language:
+ *  - split   : heading left, description right (bottom-aligned)
+ *  - columns : heading and description in one top-aligned row (7/5 of a 12-col grid)
+ *  - center  : centred heading and description
+ *  - default : simple stack (used inside asymmetric/aside layouts)
+ * Eyebrow, heading and description reveal in sequence (batch stagger in reveal.ts).
+ */
 interface Props {
   eyebrow: string;
   title: string;
   intro?: string;
   id: string;
+  layout?: "default" | "split" | "columns" | "center";
+  /** Shorthand for layout="split" */
   split?: boolean;
+  size?: "md" | "lg";
 }
-const { eyebrow, title, intro, id, split = false } = Astro.props;
+const { eyebrow, title, intro, id, split = false, size = "md" } = Astro.props;
+const layout = Astro.props.layout ?? (split ? "split" : "default");
 ---
 
-<header class:list={["section-head", { "section-head--split": split }]} data-reveal>
-  <p class="eyebrow">{eyebrow}</p>
-  <h2 class="h2" id={id}>{title}</h2>
-  {intro && <p class="lead">{intro}</p>}
+<header class:list={["section-head", `section-head--${layout}`, { "section-head--lg": size === "lg" }]}>
+  <p class="eyebrow" data-reveal="fade">{eyebrow}</p>
+  <h2 class="h2" id={id} data-reveal>{title}</h2>
+  {intro && <p class="lead" data-reveal>{intro}</p>}
   <slot />
 </header>

@@ -101,7 +101,7 @@ export const pl: Dictionary = {
   },
   solutions: {
     eyebrow: "03 / Nasze podejście",
-    title: "Nie zaczynamy od technologii. Zaczynamy od problemu.",
+    title: "Najpierw poznajemy Twoją firmę. Potem dobieramy rozwiązanie.",
     intro:
       "Każda firma działa inaczej. Dlatego najpierw poznajemy sposób pracy i szukamy miejsca, w którym można coś uprościć. Dopiero później dobieramy rozwiązanie — takie, które ma sens biznesowy i technologiczny.",
     items: [

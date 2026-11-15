@@ -13,10 +13,10 @@ const d = t(Astro.props.lang).faq;
     <SectionHead id="faq-title" eyebrow={d.eyebrow} title={d.title} />
 
     <!-- Native <details name> gives an exclusive, keyboard-accessible accordion without JS. -->
-    <div class="faq__list" data-reveal>
+    <div class="faq__list">
       {
         d.items.map((item, i) => (
-          <details class="qa" name="faq">
+          <details class="qa" name="faq" data-reveal>
             <summary class="qa__q">
               <span class="qa__num mono">{String(i + 1).padStart(2, "0")}</span>
               <span class="qa__text">{item.q}</span>

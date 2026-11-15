@@ -13,12 +13,12 @@ const d = dict.process;
 
 <section class="section section--surface process" id={processAnchor(lang)} aria-labelledby="process-title">
   <div class="container">
-    <SectionHead id="process-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} split />
+    <SectionHead id="process-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} layout="columns" />
 
     <ol role="list" class="timeline" data-timeline>
       {
         d.steps.map((step, i) => (
-          <li class="step" data-step data-reveal style={`--reveal-delay:${i * 80}ms`}>
+          <li class="step" data-step data-reveal>
             <div class="step__marker" aria-hidden="true">
               <span class="step__dot" />
             </div>
@@ -61,14 +61,21 @@ const d = dict.process;
     justify-content: center;
   }
 
-  /* Vertical connector (mobile) */
+  /* Vertical connector (mobile). It draws in after its step is revealed,
+     so the line progressively grows through the timeline. */
   .step__marker::before {
     content: "";
     position: absolute;
     top: 14px;
     bottom: -2.25rem;
     width: 1px;
-    background: var(--color-border);
+    background: linear-gradient(var(--color-brand-red), var(--color-border) 70%);
+    transform-origin: top;
+    transition: transform 800ms var(--ease-reveal) calc(var(--reveal-delay, 0ms) + 250ms);
+  }
+
+  :global(.js:not(.reveal-fallback)) .step:not(.is-visible) .step__marker::before {
+    transform: scaleY(0);
   }
 
   .step:last-child .step__marker::before {
@@ -84,11 +91,20 @@ const d = dict.process;
     background: var(--color-surface);
     transition:
       background-color 400ms var(--ease-out),
-      border-color 400ms var(--ease-out);
+      border-color 400ms var(--ease-out),
+      transform 500ms var(--ease-reveal);
+  }
+
+  :global(.js:not(.reveal-fallback)) .step:not(.is-visible) .step__dot {
+    transform: scale(0.4);
   }
 
   .step.is-visible .step__dot {
     border-color: var(--color-brand-red);
+  }
+
+  .step:hover .step__dot {
+    background: var(--color-brand-red);
   }
 
   .step:first-child .step__dot {
@@ -137,6 +153,12 @@ const d = dict.process;
       left: 13px;
       width: calc(100% + 1.5rem - 13px);
       height: 1px;
+      background: linear-gradient(90deg, var(--color-brand-red), var(--color-border) 70%);
+      transform-origin: left;
+    }
+
+    :global(.js:not(.reveal-fallback)) .step:not(.is-visible) .step__marker::before {
+      transform: scaleX(0);
     }
 
     .step__dot {

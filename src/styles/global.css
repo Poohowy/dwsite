@@ -45,6 +45,7 @@
 
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);
   --dur: 220ms;
 
   color-scheme: dark;
@@ -268,6 +269,26 @@ button {
   max-width: 60ch;
 }
 
+.section-head--lg .h2 {
+  font-size: clamp(2.3rem, 1.4rem + 3.8vw, 4.75rem);
+  letter-spacing: -0.045em;
+  line-height: 1;
+  max-width: 20ch;
+}
+
+.section-head--center {
+  justify-items: center;
+  text-align: center;
+}
+
+.section-head--center .h2 {
+  max-width: 22ch;
+}
+
+.section-head--center .lead {
+  max-width: 56ch;
+}
+
 @media (min-width: 960px) {
   .section-head--split {
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
@@ -277,6 +298,86 @@ button {
   .section-head--split .eyebrow {
     grid-column: 1 / -1;
   }
+
+  /* Columns: heading and description share one row, both aligned to the top */
+  .section-head--columns {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 2rem;
+    align-items: start;
+  }
+  .section-head--columns .eyebrow {
+    grid-column: 1 / -1;
+  }
+  .section-head--columns .h2 {
+    grid-column: 1 / span 7;
+  }
+  .section-head--columns .lead {
+    grid-column: 8 / -1;
+    /* optical nudge so the first text line meets the heading's cap height */
+    padding-top: 0.35em;
+  }
+}
+
+/* ---------- Section surfaces & transitions ---------- */
+
+/* Light sections become inset panels with rounded corners — a distinctive
+   transition between dark and light without hard full-bleed edges. */
+.section.light {
+  margin-inline: clamp(0.5rem, 0.2rem + 1vw, 1rem);
+  border-radius: clamp(18px, 1rem + 1vw, 32px);
+  overflow: clip;
+}
+
+.section.light + .section.light {
+  margin-top: clamp(0.5rem, 0.2rem + 1vw, 1rem);
+}
+
+/* Dark raised sections: a soft top light and a fading hairline separator */
+.section--surface {
+  background:
+    radial-gradient(ellipse 70% 260px at 50% 0, rgb(31 140 165 / 0.07), transparent 70%),
+    var(--color-surface);
+}
+
+.section--surface::before,
+.section--rule::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border) 25%, var(--color-border) 75%, transparent);
+}
+
+/* ---------- Spotlight hover (reusable, see scripts/spotlight.ts) ---------- */
+[data-spotlight] {
+  position: relative;
+  isolation: isolate;
+}
+
+[data-spotlight]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    240px circle at var(--sx, 50%) var(--sy, 50%),
+    var(--spot-color, rgb(31 140 165 / 0.12)),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 300ms var(--ease-out);
+  pointer-events: none;
+}
+
+[data-spotlight]:hover::after {
+  opacity: 1;
+}
+
+.light [data-spotlight] {
+  --spot-color: rgb(31 140 165 / 0.09);
 }
 
 /* ---------- Buttons ---------- */
@@ -396,17 +497,28 @@ button {
   background: var(--badge-dot, var(--color-brand-teal));
 }
 
-/* ---------- Reveal on scroll (progressive enhancement) ---------- */
-.js [data-reveal] {
-  opacity: 0;
-  transform: translateY(18px);
+/* ---------- Reveal on scroll (progressive enhancement, see scripts/reveal.ts) ---------- */
+.js:not(.reveal-fallback) [data-reveal] {
   transition:
-    opacity 700ms var(--ease-out),
-    transform 700ms var(--ease-out);
+    opacity 700ms var(--ease-reveal),
+    transform 700ms var(--ease-reveal);
   transition-delay: var(--reveal-delay, 0ms);
 }
 
-.js [data-reveal].is-visible {
+.js:not(.reveal-fallback) [data-reveal]:not(.is-visible) {
+  opacity: 0;
+  transform: translateY(var(--reveal-y, 18px));
+}
+
+.js:not(.reveal-fallback) [data-reveal="fade"]:not(.is-visible) {
+  transform: none;
+}
+
+.js:not(.reveal-fallback) [data-reveal="scale"]:not(.is-visible) {
+  transform: translateY(12px) scale(0.97);
+}
+
+.js:not(.reveal-fallback) [data-reveal="track"]:not(.is-visible) {
   opacity: 1;
   transform: none;
 }
@@ -422,8 +534,9 @@ button {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .js [data-reveal] {
-    opacity: 1;
-    transform: none;
+  .js [data-reveal],
+  .js [data-reveal]:not(.is-visible) {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

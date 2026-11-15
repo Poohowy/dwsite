@@ -44,7 +44,13 @@ const canonical = new URL(alt[lang], site).href;
     <Font cssVariable="--font-sans" preload />
     <Font cssVariable="--font-mono" />
     <script is:inline>
-      document.documentElement.classList.add("js");
+      (function (d) {
+        d.classList.add("js");
+        // Never leave content hidden: if the reveal module has not started, show everything.
+        setTimeout(function () {
+          if (!d.classList.contains("reveal-ready")) d.classList.add("reveal-fallback");
+        }, 2500);
+      })(document.documentElement);
     </script>
   </head>
   <body>
@@ -56,7 +62,9 @@ const canonical = new URL(alt[lang], site).href;
     <Footer lang={lang} />
     <script>
       import { initReveal } from "@/scripts/reveal";
+      import { initSpotlight } from "@/scripts/spotlight";
       initReveal();
+      initSpotlight();
     </script>
   </body>
 </html>
