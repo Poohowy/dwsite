@@ -1,5 +1,5 @@
 ---
-import { alternates, processAnchor, t, type Lang, type PageKey } from "@/i18n";
+import { alternates, approachAnchor, processAnchor, t, type Lang, type PageKey } from "@/i18n";
 
 interface Props {
   lang: Lang;
@@ -9,33 +9,69 @@ interface Props {
 const { lang, page } = Astro.props;
 const d = t(lang);
 const alt = alternates(page);
-const current = Astro.url.pathname;
+const home = d.routes.home;
 
 const links = [
-  { href: d.routes.pricer, label: d.nav.pricer },
-  { href: d.routes.archiflow, label: d.nav.archiflow },
-  { href: `${d.routes.home}#${processAnchor(lang)}`, label: d.nav.process },
+  { href: home, label: d.nav.home, home: true },
+  { href: `${home}#${approachAnchor(lang)}`, label: d.nav.approach },
+  { href: `${home}#${processAnchor(lang)}`, label: d.nav.process },
 ];
-const isCurrent = (href: string) => current === href;
+const products = [
+  { href: d.routes.pricer, label: d.nav.pricer, note: d.products.pricer.status, key: "pricer" as const },
+  { href: d.routes.archiflow, label: d.nav.archiflow, note: d.products.archiflow.status, key: "archiflow" as const },
+];
+const productsActive = page === "pricer" || page === "archiflow";
 ---
 
 <header class="site-header" data-header>
   <div class="container site-header__inner">
-    <a href={d.routes.home} class="site-header__logo" aria-label={d.nav.homeLabel}>
+    <a href={home} class="site-header__logo" aria-label={d.nav.homeLabel} data-home-link>
       <img src="/images/data-wildcat-logo.svg" alt="Data Wildcat" width="415" height="106" />
     </a>
 
+    <!-- Desktop navigation -->
     <nav class="site-nav" aria-label={d.nav.label}>
       <ul role="list" class="site-nav__links">
         {
           links.map((l) => (
             <li>
-              <a href={l.href} aria-current={isCurrent(l.href) ? "page" : undefined}>
+              <a
+                href={l.href}
+                class="nav-link"
+                data-home-link={l.home ? "" : undefined}
+                aria-current={l.home && page === "home" ? "page" : undefined}
+              >
                 {l.label}
               </a>
             </li>
           ))
         }
+        <li class="dropdown" data-dropdown>
+          <button
+            type="button"
+            class:list={["nav-link", "dropdown__toggle", { "is-current": productsActive }]}
+            aria-expanded="false"
+            aria-controls="nav-products"
+            data-dropdown-toggle
+          >
+            {d.nav.products}
+            <svg class="dropdown__chevron" viewBox="0 0 12 12" aria-hidden="true">
+              <path d="m3 4.5 3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.4"></path>
+            </svg>
+          </button>
+          <ul role="list" class="dropdown__menu" id="nav-products" data-dropdown-menu>
+            {
+              products.map((p) => (
+                <li>
+                  <a href={p.href} class="dropdown__item" aria-current={page === p.key ? "page" : undefined}>
+                    <span class="dropdown__name">{p.label}</span>
+                    <span class="dropdown__note mono">{p.note}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </li>
       </ul>
     </nav>
 
@@ -62,18 +98,46 @@ const isCurrent = (href: string) => current === href;
     </div>
   </div>
 
+  <!-- Mobile navigation: compact sheet under the header + backdrop -->
+  <div class="mobile-backdrop" data-menu-backdrop hidden></div>
   <div class="mobile-menu" id="mobile-menu" data-mobile-menu hidden>
     <nav class="container" aria-label={d.nav.label}>
       <ul role="list" class="mobile-menu__links">
         {
           links.map((l) => (
             <li>
-              <a href={l.href} data-menu-link>
+              <a href={l.href} class="mobile-menu__link" data-menu-link data-home-link={l.home ? "" : undefined}>
                 {l.label}
               </a>
             </li>
           ))
         }
+        <li>
+          <button
+            type="button"
+            class="mobile-menu__link mobile-menu__group"
+            aria-expanded="false"
+            aria-controls="mobile-products"
+            data-subnav-toggle
+          >
+            {d.nav.products}
+            <svg class="dropdown__chevron" viewBox="0 0 12 12" aria-hidden="true">
+              <path d="m3 4.5 3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.4"></path>
+            </svg>
+          </button>
+          <ul role="list" class="mobile-menu__sub" id="mobile-products" hidden data-subnav>
+            {
+              products.map((p) => (
+                <li>
+                  <a href={p.href} class="mobile-menu__sublink" data-menu-link>
+                    {p.label}
+                    <span class="dropdown__note mono">{p.note}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </li>
       </ul>
       <div class="mobile-menu__footer">
         <div class="lang-switch" role="group" aria-label={d.nav.langLabel}>
@@ -106,6 +170,14 @@ const isCurrent = (href: string) => current === href;
     -webkit-backdrop-filter: blur(12px);
   }
 
+  /* Opaque while the mobile menu is open; no backdrop-filter here, because it would
+     become the containing block of the fixed backdrop below. */
+  .site-header[data-open] {
+    background: var(--color-bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
   .site-header__inner {
     display: flex;
     align-items: center;
@@ -130,23 +202,144 @@ const isCurrent = (href: string) => current === href;
 
   .site-nav__links {
     display: flex;
-    gap: 2rem;
+    align-items: center;
+    gap: 0.25rem;
   }
 
-  .site-nav__links a,
-  .lang-switch a {
+  /* ----- Desktop links ----- */
+  .nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.6rem 0.85rem;
+    border: 0;
+    background: none;
     font-size: var(--text-sm);
     color: var(--color-text-muted);
+    cursor: pointer;
+    white-space: nowrap;
     transition: color var(--dur) var(--ease-out);
   }
 
-  .site-nav__links a:hover,
-  .site-nav__links a[aria-current="page"],
-  .lang-switch a:hover,
-  .lang-switch a[aria-current="true"] {
+  /* Underline indicator grows from the centre */
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0.85rem;
+    right: 0.85rem;
+    bottom: 0.3rem;
+    height: 1px;
+    background: var(--color-brand-red);
+    transform: scaleX(0);
+    transition: transform 300ms var(--ease-out);
+  }
+
+  .nav-link:hover,
+  .nav-link[aria-current="page"],
+  .nav-link.is-current,
+  .dropdown__toggle[aria-expanded="true"] {
     color: var(--color-text);
   }
 
+  .nav-link:hover::after,
+  .nav-link[aria-current="page"]::after,
+  .nav-link.is-current::after {
+    transform: scaleX(1);
+  }
+
+  .dropdown__toggle::after {
+    right: 1.85rem;
+  }
+
+  .dropdown__chevron {
+    width: 12px;
+    height: 12px;
+    transition: transform 250ms var(--ease-out);
+  }
+
+  [aria-expanded="true"] > .dropdown__chevron {
+    transform: rotate(180deg);
+  }
+
+  /* ----- Products dropdown ----- */
+  .dropdown {
+    position: relative;
+  }
+
+  .dropdown__menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 50%;
+    min-width: 240px;
+    padding: 0.4rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    box-shadow: 0 20px 40px -20px rgb(0 0 0 / 0.8);
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -6px);
+    transition:
+      opacity 180ms var(--ease-out),
+      transform 220ms var(--ease-out),
+      visibility 0s linear 220ms;
+  }
+
+  /* Invisible bridge so the pointer can travel from the toggle to the menu */
+  .dropdown__menu::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -0.6rem;
+    height: 0.6rem;
+  }
+
+  .dropdown[data-open] .dropdown__menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+    transition:
+      opacity 180ms var(--ease-out),
+      transform 220ms var(--ease-out),
+      visibility 0s;
+  }
+
+  .dropdown__item {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 0.8rem;
+    border-radius: var(--radius-sm);
+    transition: background-color var(--dur) var(--ease-out);
+  }
+
+  .dropdown__item:hover,
+  .dropdown__item:focus-visible {
+    background: var(--color-surface-raised);
+  }
+
+  .dropdown__item[aria-current="page"] .dropdown__name {
+    color: var(--color-teal-text);
+  }
+
+  .dropdown__name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .dropdown__note {
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  /* ----- Right-hand actions ----- */
   .site-header__actions {
     display: flex;
     align-items: center;
@@ -170,13 +363,20 @@ const isCurrent = (href: string) => current === href;
   .lang-switch a {
     font-size: var(--text-xs);
     padding: 0.5rem 0.15rem;
+    color: var(--color-text-muted);
+    transition: color var(--dur) var(--ease-out);
+  }
+
+  .lang-switch a:hover,
+  .lang-switch a[aria-current="true"] {
+    color: var(--color-text);
   }
 
   .lang-switch a[aria-current="true"] {
     box-shadow: inset 0 -1px 0 var(--color-brand-red);
   }
 
-  /* Mobile menu toggle */
+  /* ----- Mobile toggle ----- */
   .menu-toggle {
     display: inline-grid;
     place-content: center;
@@ -204,33 +404,92 @@ const isCurrent = (href: string) => current === href;
     transform: translateY(-3.75px) rotate(-45deg);
   }
 
+  /* ----- Mobile sheet ----- */
+  .mobile-backdrop {
+    position: fixed;
+    inset: var(--header-h) 0 0;
+    background: rgb(5 6 7 / 0.6);
+    animation: fade-in 200ms var(--ease-out);
+  }
+
   .mobile-menu {
-    border-top: 1px solid var(--color-border-soft);
-    background: var(--color-bg);
-    height: calc(100dvh - var(--header-h));
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: calc(100dvh - var(--header-h));
     overflow-y: auto;
+    border-top: 1px solid var(--color-border-soft);
+    border-bottom: 1px solid var(--color-border-soft);
+    background: var(--color-bg);
+    animation: sheet-in 260ms var(--ease-out);
+  }
+
+  @keyframes sheet-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
   }
 
   .mobile-menu__links {
-    padding-block: 1.5rem;
+    padding-block: 0.75rem 1rem;
   }
 
-  .mobile-menu__links a {
-    display: block;
-    padding: 1rem 0;
-    font-size: 1.6rem;
-    font-weight: 500;
-    letter-spacing: -0.03em;
+  .mobile-menu__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 52px;
+    padding: 0.75rem 0;
+    border: 0;
     border-bottom: 1px solid var(--color-border-soft);
+    background: none;
+    font-size: 1.3rem;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    text-align: left;
+    color: var(--color-text);
+    cursor: pointer;
+  }
+
+  .mobile-menu__group .dropdown__chevron {
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-muted);
+  }
+
+  .mobile-menu__sub {
+    padding: 0.4rem 0 0.6rem;
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .mobile-menu__sublink {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 44px;
+    padding: 0.6rem 0 0.6rem 1rem;
+    border-left: 1px solid var(--color-border);
+    font-size: 1.05rem;
+    color: var(--color-text);
   }
 
   .mobile-menu__footer {
     display: grid;
-    gap: 1.5rem;
-    padding-bottom: 2rem;
+    gap: 1.25rem;
+    padding-bottom: 1.5rem;
   }
 
-  @media (min-width: 900px) {
+  @media (min-width: 1024px) {
     .site-nav,
     .site-header__actions > .lang-switch,
     .site-header__cta {
@@ -244,7 +503,8 @@ const isCurrent = (href: string) => current === href;
       justify-content: flex-end;
     }
     .menu-toggle,
-    .mobile-menu {
+    .mobile-menu,
+    .mobile-backdrop {
       display: none !important;
     }
   }
@@ -252,26 +512,104 @@ const isCurrent = (href: string) => current === href;
 
 <script>
   const header = document.querySelector<HTMLElement>("[data-header]");
-  const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
-  const menu = document.querySelector<HTMLElement>("[data-mobile-menu]");
-  const label = document.querySelector<HTMLElement>("[data-menu-label]");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /* ---------- Sticky header background ---------- */
   if (header) {
     const onScroll = () => header.toggleAttribute("data-scrolled", window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
   }
 
-  if (header && toggle && menu && label) {
+  /* ---------- Home: scroll to top without reload when already on the homepage ---------- */
+  document.querySelectorAll<HTMLAnchorElement>("a[data-home-link]").forEach((a) => {
+    a.addEventListener("click", (e) => {
+      if (new URL(a.href).pathname !== window.location.pathname) return;
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+      if (window.location.hash) history.replaceState(null, "", window.location.pathname);
+    });
+  });
+
+  /* ---------- Desktop "Products" dropdown ---------- */
+  document.querySelectorAll<HTMLElement>("[data-dropdown]").forEach((dd) => {
+    const toggle = dd.querySelector<HTMLButtonElement>("[data-dropdown-toggle]")!;
+    const menu = dd.querySelector<HTMLElement>("[data-dropdown-menu]")!;
+    const items = () => Array.from(menu.querySelectorAll<HTMLAnchorElement>("a"));
+    const hover = window.matchMedia("(hover: hover) and (pointer: fine)");
+    let closeTimer = 0;
+
+    const setOpen = (open: boolean) => {
+      window.clearTimeout(closeTimer);
+      dd.toggleAttribute("data-open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+    };
+    const isOpen = () => toggle.getAttribute("aria-expanded") === "true";
+
+    toggle.addEventListener("click", () => setOpen(!isOpen()));
+
+    // Hover intent (desktop pointers only), with a short grace period on leave
+    dd.addEventListener("pointerenter", (e) => {
+      if (hover.matches && e.pointerType === "mouse") setOpen(true);
+    });
+    dd.addEventListener("pointerleave", (e) => {
+      if (!hover.matches || e.pointerType !== "mouse") return;
+      closeTimer = window.setTimeout(() => setOpen(false), 180);
+    });
+
+    // Keyboard: ArrowDown opens and focuses the first item; arrows move; Escape closes
+    toggle.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setOpen(true);
+        items()[0]?.focus();
+      }
+    });
+    menu.addEventListener("keydown", (e) => {
+      const list = items();
+      const i = list.indexOf(document.activeElement as HTMLAnchorElement);
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        list[(i + 1) % list.length]?.focus();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        list[(i - 1 + list.length) % list.length]?.focus();
+      }
+    });
+    dd.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && isOpen()) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    // Close when focus leaves or the user clicks elsewhere
+    dd.addEventListener("focusout", (e) => {
+      if (!dd.contains(e.relatedTarget as Node | null)) setOpen(false);
+    });
+    document.addEventListener("click", (e) => {
+      if (isOpen() && !dd.contains(e.target as Node)) setOpen(false);
+    });
+  });
+
+  /* ---------- Mobile menu ---------- */
+  const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+  const menu = document.querySelector<HTMLElement>("[data-mobile-menu]");
+  const backdrop = document.querySelector<HTMLElement>("[data-menu-backdrop]");
+  const label = document.querySelector<HTMLElement>("[data-menu-label]");
+
+  if (header && toggle && menu && backdrop && label) {
     const setOpen = (open: boolean) => {
       toggle.setAttribute("aria-expanded", String(open));
       label.textContent = (open ? toggle.dataset.labelClose : toggle.dataset.labelOpen) ?? "";
       menu.hidden = !open;
+      backdrop.hidden = !open;
       header.toggleAttribute("data-open", open);
       document.body.style.overflow = open ? "hidden" : "";
     };
 
     toggle.addEventListener("click", () => setOpen(toggle.getAttribute("aria-expanded") !== "true"));
+    backdrop.addEventListener("click", () => setOpen(false));
     menu.querySelectorAll("[data-menu-link]").forEach((a) => a.addEventListener("click", () => setOpen(false)));
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
@@ -279,6 +617,15 @@ const isCurrent = (href: string) => current === href;
         toggle.focus();
       }
     });
-    window.matchMedia("(min-width: 900px)").addEventListener("change", (e) => e.matches && setOpen(false));
+    window.matchMedia("(min-width: 1024px)").addEventListener("change", (e) => e.matches && setOpen(false));
+
+    // Products group (disclosure)
+    const subToggle = menu.querySelector<HTMLButtonElement>("[data-subnav-toggle]");
+    const sub = menu.querySelector<HTMLElement>("[data-subnav]");
+    subToggle?.addEventListener("click", () => {
+      const open = subToggle.getAttribute("aria-expanded") !== "true";
+      subToggle.setAttribute("aria-expanded", String(open));
+      if (sub) sub.hidden = !open;
+    });
   }
 </script>

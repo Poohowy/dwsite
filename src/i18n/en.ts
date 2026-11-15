@@ -14,6 +14,9 @@ export const en: Dictionary = {
     pricer: "Pricer",
     archiflow: "ArchiFlow",
     process: "How we work",
+    home: "Home",
+    approach: "Our approach",
+    products: "Products",
     cta: "Book a consultation",
     menuOpen: "Open menu",
     menuClose: "Close menu",
@@ -198,7 +201,7 @@ export const en: Dictionary = {
     items: [
       {
         q: "Does my company have to use AI to work with Data Wildcat?",
-        a: "No. AI is only one of the tools. Sometimes automation, a system integration or a custom application is the better answer. We start with the problem and choose the approach that fits it.",
+        a: "No. AI is only one of the tools. Sometimes automation, a system integration or a custom application is the better answer. We first get to know your situation, then choose the approach that fits it.",
       },
       {
         q: "Do you work with small companies?",
@@ -231,7 +234,7 @@ export const en: Dictionary = {
     ],
   },
   finalCta: {
-    title: "Got a problem that could be solved better? Let's talk.",
+    title: "Is there something in your business that could work better? Let's talk.",
     text: "Tell us what takes up your team's time or makes everyday work harder. Together we'll see whether we can improve it.",
   },
   footer: {

@@ -7,14 +7,28 @@ interface Props {
 }
 const dict = t(Astro.props.lang);
 const d = dict.finalCta;
+
+// Split "Question? Let's talk." so the closing invitation can be set on its own line.
+const match = d.title.match(/^(.*\?)\s+(.+)$/);
+const question = match ? match[1] : d.title;
+const invite = match ? match[2].replace(/\.$/, "") : "";
 ---
 
 <section class="section light final" aria-labelledby="final-title">
+  <div class="final__bg" aria-hidden="true"></div>
   <div class="container final__inner">
-    <h2 class="final__title" id="final-title" data-reveal>{d.title}</h2>
-    <div class="final__side" data-reveal>
-      <p class="lead">{d.text}</p>
-      <a href={dict.routes.contact} class="btn btn--primary btn--block-mobile">
+    <span class="final__mark" aria-hidden="true" data-reveal="fade"></span>
+    <h2 class="final__title" id="final-title" data-reveal>
+      <span class="final__question">{question}</span>
+      {
+        invite && (
+          <span class="final__invite">{invite}<span class="accent">.</span></span>
+        )
+      }
+    </h2>
+    <p class="lead final__text" data-reveal>{d.text}</p>
+    <div class="final__action" data-reveal>
+      <a href={dict.routes.contact} class="btn btn--primary btn--lg btn--block-mobile">
         {dict.cta.primary}
         <ArrowIcon />
       </a>
@@ -23,33 +37,71 @@ const d = dict.finalCta;
 </section>
 
 <style>
+  .final {
+    position: relative;
+    isolation: isolate;
+    padding-block: clamp(6rem, 4rem + 8vw, 11rem);
+    /* Clear separation from the footer */
+    margin-bottom: clamp(0.5rem, 0.2rem + 1vw, 1rem);
+  }
+
+  /* Restrained background: fading dot texture + two soft brand-coloured lights */
+  .final__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 45% 55% at 50% 0%, rgb(31 140 165 / 0.14), transparent 70%),
+      radial-gradient(ellipse 35% 45% at 50% 105%, rgb(228 0 58 / 0.08), transparent 70%),
+      radial-gradient(circle at 1px 1px, rgb(21 23 25 / 0.09) 1px, transparent 1.4px) 0 0 / 22px 22px;
+    mask-image: radial-gradient(ellipse 80% 75% at 50% 50%, #000 35%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 75% at 50% 50%, #000 35%, transparent 85%);
+  }
+
   .final__inner {
     display: grid;
-    gap: 2.5rem;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .final__mark {
+    width: 44px;
+    height: 3px;
+    background: var(--color-brand-red);
+    margin-bottom: clamp(2rem, 1.5rem + 1.5vw, 3rem);
   }
 
   .final__title {
-    font-size: clamp(2.4rem, 1.4rem + 4.4vw, 5.5rem);
+    font-size: clamp(2.5rem, 1.3rem + 5.2vw, 6.25rem);
     font-weight: 600;
     letter-spacing: -0.05em;
     line-height: 0.98;
-    max-width: 15ch;
+    max-width: 16ch;
     text-wrap: balance;
   }
 
-  .final__side {
-    display: grid;
-    gap: 1.75rem;
-    justify-items: start;
-    align-content: end;
-    max-width: 44ch;
+  .final__question,
+  .final__invite {
+    display: block;
   }
 
-  @media (min-width: 1024px) {
-    .final__inner {
-      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-      align-items: end;
-      gap: 4rem;
+  .final__invite {
+    margin-top: 0.12em;
+    color: var(--color-light-muted);
+  }
+
+  .final__text {
+    max-width: 50ch;
+    margin-top: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem);
+  }
+
+  .final__action {
+    margin-top: clamp(2rem, 1.5rem + 1.5vw, 3rem);
+  }
+
+  @media (max-width: 559px) {
+    .final__action {
+      width: 100%;
     }
   }
 </style>

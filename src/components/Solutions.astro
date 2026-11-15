@@ -9,19 +9,20 @@
  */
 import Icon from "@/components/Icon.astro";
 import SectionHead from "@/components/SectionHead.astro";
-import { t, type Lang } from "@/i18n";
+import { approachAnchor, t, type Lang } from "@/i18n";
 import type { IconName } from "@/lib/icons";
 
 interface Props {
   lang: Lang;
 }
-const d = t(Astro.props.lang).solutions;
+const { lang } = Astro.props;
+const d = t(lang).solutions;
 const dep = d.deployment;
 const icons: IconName[] = ["automation", "ai", "app", "integration"];
 const envIcons: IconName[] = ["cloud", "server"];
 ---
 
-<section class="section light solutions" aria-labelledby="solutions-title">
+<section class="section light solutions" id={approachAnchor(lang)} aria-labelledby="solutions-title">
   <div class="container">
     <SectionHead id="solutions-title" eyebrow={d.eyebrow} title={d.title} intro={d.intro} layout="center" />
 

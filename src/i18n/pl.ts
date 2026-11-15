@@ -13,6 +13,9 @@ export const pl: Dictionary = {
     pricer: "Pricer",
     archiflow: "ArchiFlow",
     process: "Jak pracujemy?",
+    home: "Home",
+    approach: "Nasze podejście",
+    products: "Produkty",
     cta: "Umów konsultację",
     menuOpen: "Otwórz menu",
     menuClose: "Zamknij menu",
@@ -197,7 +200,7 @@ export const pl: Dictionary = {
     items: [
       {
         q: "Czy moja firma musi korzystać z AI, żeby współpracować z Data Wildcat?",
-        a: "Nie. AI jest tylko jednym z narzędzi. Czasami lepszym rozwiązaniem będzie automatyzacja, integracja systemów lub dedykowana aplikacja. Zaczynamy od problemu i dobieramy do niego odpowiednie podejście.",
+        a: "Nie. AI jest tylko jednym z narzędzi. Czasami lepszym rozwiązaniem będzie automatyzacja, integracja systemów lub dedykowana aplikacja. Najpierw poznajemy Twoją sytuację, a potem dobieramy do niej odpowiednie podejście.",
       },
       {
         q: "Czy współpracujecie z małymi firmami?",
@@ -205,7 +208,7 @@ export const pl: Dictionary = {
       },
       {
         q: "Nie wiem dokładnie, czego potrzebuję. Czy mimo to mogę się odezwać?",
-        a: "Oczywiście. Nie musisz znać technologii ani gotowego rozwiązania. Wystarczy, że opowiesz nam, co chciałbyś usprawnić.",
+        a: "Oczywiście. Nie musisz znać technologii ani gotowego rozwiązania. Wystarczy, że opowiesz nam, co chcesz usprawnić.",
       },
       {
         q: "Jak wygląda pierwsza konsultacja?",
@@ -230,7 +233,7 @@ export const pl: Dictionary = {
     ],
   },
   finalCta: {
-    title: "Masz problem, który można rozwiązać lepiej? Porozmawiajmy.",
+    title: "Jest coś, co można usprawnić w Twojej firmie? Porozmawiajmy.",
     text: "Opowiedz nam, co zajmuje czas Twojego zespołu lub utrudnia codzienną pracę. Wspólnie sprawdzimy, czy możemy to usprawnić.",
   },
   footer: {

@@ -1,4 +1,9 @@
 ---
+/**
+ * FAQ accordion — one answer open at a time.
+ * Progressive: without JS all answers are visible. With JS (html.js) answers start
+ * collapsed and each question is a real <button> with aria-expanded / aria-controls.
+ */
 import SectionHead from "@/components/SectionHead.astro";
 import { t, type Lang } from "@/i18n";
 
@@ -12,20 +17,23 @@ const d = t(Astro.props.lang).faq;
   <div class="container faq__inner">
     <SectionHead id="faq-title" eyebrow={d.eyebrow} title={d.title} />
 
-    <!-- Native <details name> gives an exclusive, keyboard-accessible accordion without JS. -->
-    <div class="faq__list">
+    <div class="faq__list" data-faq>
       {
         d.items.map((item, i) => (
-          <details class="qa" name="faq" data-reveal>
-            <summary class="qa__q">
-              <span class="qa__num mono">{String(i + 1).padStart(2, "0")}</span>
-              <span class="qa__text">{item.q}</span>
-              <span class="qa__icon" aria-hidden="true" />
-            </summary>
-            <div class="qa__a">
-              <p>{item.a}</p>
+          <div class="qa" data-qa data-reveal>
+            <h3 class="qa__heading">
+              <button type="button" class="qa__q" id={`faq-q-${i}`} aria-controls={`faq-a-${i}`} data-qa-toggle>
+                <span class="qa__num mono">{String(i + 1).padStart(2, "0")}</span>
+                <span class="qa__text">{item.q}</span>
+                <span class="qa__icon" aria-hidden="true" />
+              </button>
+            </h3>
+            <div class="qa__panel" id={`faq-a-${i}`} role="region" aria-labelledby={`faq-q-${i}`} data-qa-panel>
+              <div class="qa__panel-inner">
+                <p class="qa__a">{item.a}</p>
+              </div>
             </div>
-          </details>
+          </div>
         ))
       }
     </div>
@@ -38,52 +46,98 @@ const d = t(Astro.props.lang).faq;
   }
 
   .qa {
+    position: relative;
     border-bottom: 1px solid var(--color-border);
-    interpolate-size: allow-keywords;
+    transition: background-color 300ms var(--ease-out);
+  }
+
+  /* Expanded state: subtle raised surface + red accent on the left edge */
+  .qa::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -1px;
+    bottom: -1px;
+    width: 2px;
+    background: var(--color-brand-red);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 350ms var(--ease-out);
+  }
+
+  .qa.is-open {
+    background: linear-gradient(90deg, rgb(255 255 255 / 0.025), transparent 70%);
+  }
+
+  .qa.is-open::before {
+    transform: scaleY(1);
+  }
+
+  .qa__heading {
+    font: inherit;
+    margin: 0;
   }
 
   .qa__q {
     display: grid;
-    grid-template-columns: 2.5rem minmax(0, 1fr) 24px;
+    grid-template-columns: 2.5rem minmax(0, 1fr) 28px;
     gap: 1rem;
     align-items: center;
-    padding-block: 1.4rem;
+    width: 100%;
+    padding: 1.4rem 0.75rem 1.4rem 1rem;
+    border: 0;
+    background: none;
+    text-align: left;
     cursor: pointer;
-    list-style: none;
     font-size: var(--text-md);
     font-weight: 500;
     letter-spacing: -0.015em;
     line-height: 1.35;
-    transition: color var(--dur) var(--ease-out);
-  }
-
-  .qa__q::-webkit-details-marker {
-    display: none;
-  }
-
-  .qa__q:hover .qa__text {
     color: var(--color-text);
+  }
+
+  .qa__q:focus-visible {
+    outline-offset: -2px;
+    border-radius: var(--radius-sm);
   }
 
   .qa__text {
-    color: var(--color-text);
+    transition:
+      color var(--dur) var(--ease-out),
+      transform 300ms var(--ease-out);
   }
 
   .qa__num {
     font-size: var(--text-xs);
     color: var(--color-text-muted);
+    transition: color var(--dur) var(--ease-out);
   }
 
-  .qa[open] .qa__num {
+  /* Hover feedback */
+  .qa__q:hover .qa__text {
+    transform: translateX(3px);
+  }
+
+  .qa__q:hover .qa__icon {
+    border-color: var(--color-text-muted);
+  }
+
+  .qa.is-open .qa__num,
+  .qa__q:hover .qa__num {
     color: var(--color-brand-red);
   }
 
+  /* Plus → minus */
   .qa__icon {
     position: relative;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border: 1px solid var(--color-border);
     border-radius: 50%;
+    transition:
+      border-color var(--dur) var(--ease-out),
+      background-color 300ms var(--ease-out),
+      transform 350ms var(--ease-out);
   }
 
   .qa__icon::before,
@@ -96,46 +150,90 @@ const d = t(Astro.props.lang).faq;
     height: 1.5px;
     background: var(--color-text);
     transform: translate(-50%, -50%);
-    transition: transform var(--dur) var(--ease-out);
+    transition:
+      transform 350ms var(--ease-out),
+      opacity 250ms var(--ease-out);
   }
 
   .qa__icon::after {
     transform: translate(-50%, -50%) rotate(90deg);
   }
 
-  .qa[open] .qa__icon::after {
-    transform: translate(-50%, -50%) rotate(0deg);
+  .qa.is-open .qa__icon {
+    background: var(--color-brand-red);
+    border-color: var(--color-brand-red);
+    transform: rotate(180deg);
   }
 
+  .qa.is-open .qa__icon::before,
+  .qa.is-open .qa__icon::after {
+    background: #fff;
+  }
+
+  .qa.is-open .qa__icon::after {
+    transform: translate(-50%, -50%) rotate(0deg);
+    opacity: 0;
+  }
+
+  /* Answer */
   .qa__a {
-    padding: 0 2.5rem 1.6rem calc(2.5rem + 1rem);
+    padding: 0 3.25rem 1.6rem calc(1rem + 2.5rem + 1rem);
     color: var(--color-text-muted);
     max-width: 75ch;
+    line-height: 1.65;
   }
 
-  /* Progressive enhancement: smooth height where supported */
-  .qa::details-content {
-    block-size: 0;
-    overflow: hidden;
+  /* Collapsing only applies when JS is running (otherwise answers stay visible).
+     Grid-rows 0fr → 1fr animates to the natural height without measuring. */
+  :global(.js) .qa__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
     transition:
-      block-size 300ms var(--ease-out),
-      content-visibility 300ms allow-discrete;
+      grid-template-rows 320ms var(--ease-out),
+      visibility 0s linear 320ms;
   }
 
-  .qa[open]::details-content {
-    block-size: auto;
+  :global(.js) .qa.is-open .qa__panel {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition:
+      grid-template-rows 320ms var(--ease-out),
+      visibility 0s;
+  }
+
+  .qa__panel-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  :global(.js) .qa__a {
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      opacity 220ms var(--ease-out),
+      transform 300ms var(--ease-out);
+  }
+
+  :global(.js) .qa.is-open .qa__a {
+    opacity: 1;
+    transform: none;
+    transition-delay: 80ms;
   }
 
   @media (max-width: 559px) {
     .qa__q {
-      grid-template-columns: minmax(0, 1fr) 24px;
+      grid-template-columns: minmax(0, 1fr) 28px;
+      padding-left: 0.75rem;
+      padding-right: 0.25rem;
+      font-size: var(--text-base);
     }
     .qa__num {
       display: none;
     }
     .qa__a {
-      padding-left: 0;
-      padding-right: 0;
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
     }
   }
 
@@ -152,3 +250,23 @@ const d = t(Astro.props.lang).faq;
     }
   }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-faq]").forEach((list) => {
+    const items = Array.from(list.querySelectorAll<HTMLElement>("[data-qa]"));
+
+    const setOpen = (item: HTMLElement, open: boolean) => {
+      item.classList.toggle("is-open", open);
+      item.querySelector("[data-qa-toggle]")?.setAttribute("aria-expanded", String(open));
+    };
+
+    items.forEach((item) => {
+      setOpen(item, false);
+      item.querySelector("[data-qa-toggle]")?.addEventListener("click", () => {
+        const open = !item.classList.contains("is-open");
+        items.forEach((other) => other !== item && setOpen(other, false)); // one open at a time
+        setOpen(item, open);
+      });
+    });
+  });
+</script>

@@ -44,6 +44,9 @@ export interface Dictionary {
     pricer: string;
     archiflow: string;
     process: string;
+    home: string;
+    approach: string;
+    products: string;
     cta: string;
     menuOpen: string;
     menuClose: string;

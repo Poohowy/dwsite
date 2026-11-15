@@ -403,7 +403,18 @@ button {
   transition:
     background-color var(--dur) var(--ease-out),
     border-color var(--dur) var(--ease-out),
-    color var(--dur) var(--ease-out);
+    color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+
+/* Slight lift on hover, gentle press on click (transform only — no layout shift) */
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.985);
 }
 
 .btn svg {
@@ -425,6 +436,13 @@ button {
 .btn--primary:hover {
   --btn-bg: var(--color-brand-red-hover);
   --btn-border: var(--color-brand-red-hover);
+  box-shadow: 0 10px 24px -14px rgb(228 0 58 / 0.7);
+}
+
+.btn--lg {
+  min-height: 56px;
+  padding: 1rem 1.75rem;
+  font-size: var(--text-md);
 }
 
 .btn--ghost {

@@ -15,6 +15,11 @@ export function processAnchor(lang: Lang): string {
   return lang === "pl" ? "jak-pracujemy" : "how-we-work";
 }
 
+/** In-page anchor of the "Our approach" section. */
+export function approachAnchor(lang: Lang): string {
+  return lang === "pl" ? "nasze-podejscie" : "our-approach";
+}
+
 export type PageKey = keyof Dictionary["routes"];
 
 /** Path of the same page in the other language — used by the PL/EN switcher and hreflang. */
