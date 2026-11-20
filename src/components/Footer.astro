@@ -31,7 +31,9 @@ const COMPANY = {
         <a href={d.routes.home} aria-label={d.nav.homeLabel}>
           <img src="/images/data-wildcat-logo.svg" alt="Data Wildcat" width="415" height="106" loading="lazy" />
         </a>
-        <p class="footer__tagline">{f.tagline}</p>
+        <p class="footer__tagline">
+          {f.tagline.split(/(?<=\.)\s+/).map((part, i) => (i > 0 ? [<br />, part] : part))}
+        </p>
 
         <div class="footer__company">
           <div>

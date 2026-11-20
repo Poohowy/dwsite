@@ -17,6 +17,12 @@ const { demo, locale, currency } = Astro.props;
 const money = new Intl.NumberFormat(locale, { style: "currency", currency, minimumFractionDigits: 2 });
 const percent = new Intl.NumberFormat(locale, { style: "percent", minimumFractionDigits: 1 });
 const first = demo.scenarios[0]?.id;
+const firstIndustry = demo.scenarios[0]?.industry;
+const quoteTotals = (q: { lines: { amount: number }[]; vatRate: number }) => {
+  const net = q.lines.reduce((sum, l) => sum + l.amount, 0);
+  const vat = Math.round(net * q.vatRate * 100) / 100;
+  return { net, vat, gross: net + vat };
+};
 ---
 
 <div
@@ -24,6 +30,7 @@ const first = demo.scenarios[0]?.id;
   data-pricer-demo
   data-state="idle"
   data-scenario={first}
+  data-industry={firstIndustry}
   data-label-running={demo.running}
   data-label-done={demo.done}
 >
@@ -36,12 +43,36 @@ const first = demo.scenarios[0]?.id;
   <div class="demo__frame">
     <!-- Input side -->
     <div class="demo__input">
+      <fieldset class="scenarios industries">
+        <legend class="scenarios__legend mono">{demo.industryLabel}</legend>
+        <div class="industries__list">
+          {
+            demo.industries.map((ind) => (
+              <label class="ind">
+                <input
+                  type="radio"
+                  name="pricer-industry"
+                  value={ind.id}
+                  checked={ind.id === firstIndustry}
+                  class="scn__input"
+                  data-industry-input
+                />
+                <span class="ind__box">
+                  <span class="ind__label">{ind.label}</span>
+                  <span class="ind__hint">{ind.hint}</span>
+                </span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+
       <fieldset class="scenarios">
         <legend class="scenarios__legend mono">{demo.selectorLabel}</legend>
         <div class="scenarios__list">
           {
             demo.scenarios.map((s, i) => (
-              <label class="scn">
+              <label class="scn" data-industry={s.industry} hidden={s.industry !== firstIndustry}>
                 <input
                   type="radio"
                   name="pricer-scenario"
@@ -115,21 +146,27 @@ const first = demo.scenarios[0]?.id;
         <p>{demo.placeholder}</p>
       </div>
 
-      <ol class="out-steps" role="list">
-        {
-          demo.steps.map((step, i) => (
-            <li class="out-step" data-step>
-              <span class="out-step__icon" aria-hidden="true">
-                <span class="out-step__num mono">{i + 1}</span>
-                <svg class="out-step__check" viewBox="0 0 16 16">
-                  <path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" />
-                </svg>
-              </span>
-              <span class="out-step__label">{step}</span>
-            </li>
-          ))
-        }
-      </ol>
+      {
+        demo.industries.map((ind) => (
+          <ol
+            class:list={["out-steps", { "is-active": ind.id === firstIndustry }]}
+            role="list"
+            data-steps-for={ind.id}
+          >
+            {(ind.steps ?? demo.steps).map((step, i) => (
+              <li class="out-step" data-step>
+                <span class="out-step__icon" aria-hidden="true">
+                  <span class="out-step__num mono">{i + 1}</span>
+                  <svg class="out-step__check" viewBox="0 0 16 16">
+                    <path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" />
+                  </svg>
+                </span>
+                <span class="out-step__label">{step}</span>
+              </li>
+            ))}
+          </ol>
+        ))
+      }
 
       {
         demo.scenarios.map((s) => (
@@ -164,13 +201,13 @@ const first = demo.scenarios[0]?.id;
                   <dd>{s.offer.customer}</dd>
                 </div>
                 <div>
-                  <dt>{demo.quantityLabel}</dt>
+                  <dt>{s.offer.quantityLabel ?? demo.quantityLabel}</dt>
                   <dd>{s.offer.quantity}</dd>
                 </div>
               </dl>
 
               <div class="doc__block">
-                <p class="doc__label">{demo.itemsLabel}</p>
+                <p class="doc__label">{s.offer.itemsLabel ?? demo.itemsLabel}</p>
                 <ul class="doc__items" role="list">
                   {s.offer.items.map((item) => (
                     <li>
@@ -242,6 +279,50 @@ const first = demo.scenarios[0]?.id;
                     {s.offer.budget.reviewNote}
                   </p>
                 </div>
+              )}
+
+              {s.offer.quote && (
+                <div class="doc__block">
+                  <div class="quote__head">
+                    <p class="doc__label">{s.offer.quote.label}</p>
+                    <span class="quote__tag mono">{demo.illustrativeLabel}</span>
+                  </div>
+                  <table class="price quote">
+                    <tbody>
+                      {s.offer.quote.lines.map((line) => (
+                        <tr>
+                          <th scope="row">
+                            <span class="quote__item">{line.label}</span>
+                            <span class="quote__detail">{line.detail}</span>
+                          </th>
+                          <td>{money.format(line.amount)}</td>
+                        </tr>
+                      ))}
+                      <tr class="quote__total">
+                        <th scope="row">{demo.totalNetLabel}</th>
+                        <td>{money.format(quoteTotals(s.offer.quote).net)}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">{demo.totalVatLabel}</th>
+                        <td>{money.format(quoteTotals(s.offer.quote).vat)}</td>
+                      </tr>
+                      <tr class="price__gross">
+                        <th scope="row">{demo.totalGrossLabel}</th>
+                        <td>{money.format(quoteTotals(s.offer.quote).gross)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {s.offer.reviewNote && (
+                <p class="review">
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <circle cx="8" cy="5.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.3" />
+                    <path d="M3 13.5c.6-2.5 2.6-4 5-4s4.4 1.5 5 4" fill="none" stroke="currentColor" stroke-width="1.3" />
+                  </svg>
+                  {s.offer.reviewNote}
+                </p>
               )}
 
               <footer class="doc__foot">
@@ -429,6 +510,64 @@ const first = demo.scenarios[0]?.id;
   .scn__hint {
     font-size: var(--text-sm);
     color: var(--color-text-muted);
+  }
+
+  /* ---------- Industry selector (compact cards above the scenarios) ---------- */
+  .industries__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+    gap: 0.5rem;
+  }
+
+  .ind {
+    position: relative;
+    display: block;
+    cursor: pointer;
+  }
+
+  .ind__box {
+    display: grid;
+    gap: 0.2rem;
+    height: 100%;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    transition:
+      border-color var(--dur) var(--ease-out),
+      background-color var(--dur) var(--ease-out);
+  }
+
+  .ind:hover .ind__box {
+    border-color: var(--color-text-muted);
+  }
+
+  .scn__input:checked + .ind__box {
+    border-color: var(--color-brand-red);
+    background: rgb(228 0 58 / 0.07);
+    box-shadow: inset 0 2px 0 var(--color-brand-red);
+  }
+
+  .scn__input:focus-visible + .ind__box {
+    outline: 2px solid var(--color-teal-text);
+    outline-offset: 2px;
+  }
+
+  .ind__label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: 1.3;
+  }
+
+  .ind__hint {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    line-height: 1.35;
+  }
+
+  .scn[hidden] {
+    display: none;
   }
 
   /* ---------- Email ---------- */
@@ -624,6 +763,11 @@ const first = demo.scenarios[0]?.id;
   .result {
     display: grid;
     gap: 1rem;
+  }
+
+  /* Only the current industry's step list is shown while running */
+  :global(html.js) .demo[data-state] .out-steps[data-steps-for]:not(.is-active) {
+    display: none;
   }
 
   /* State switching (JS). Without JS the default pane + static result show. */
@@ -837,6 +981,45 @@ const first = demo.scenarios[0]?.id;
   .price__discount th,
   .price__discount td {
     font-size: 0.8125rem;
+  }
+
+  /* Itemised illustrative calculation (service / custom-order scenarios) */
+  .quote__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .quote__tag {
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.45rem;
+    border: 1px dashed #c1c6c3;
+    border-radius: 4px;
+    color: var(--color-light-muted);
+  }
+
+  .quote__item {
+    display: block;
+    color: var(--color-light-text);
+    font-weight: 500;
+  }
+
+  .quote__detail {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 0.75rem;
+    color: var(--color-light-muted);
+  }
+
+  .quote__total th,
+  .quote__total td {
+    border-top: 1px solid #cfd3d0;
+    font-weight: 600;
+    color: var(--color-light-text);
   }
 
   /* Budget */

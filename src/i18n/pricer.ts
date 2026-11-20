@@ -22,8 +22,27 @@ export interface DemoPricing {
   discountPercent: number;
 }
 
+/** An industry groups scenarios that share one pricing approach. */
+export interface DemoIndustry {
+  id: string;
+  label: string;
+  /** Pricing approach shown under the industry name. */
+  hint: string;
+  /** Industry-specific processing labels; falls back to `demo.steps`. */
+  steps?: string[];
+}
+
+/** Itemised, illustrative calculation (service / custom-order scenarios). */
+export interface DemoQuote {
+  label: string;
+  lines: { label: string; detail: string; amount: number }[];
+  vatRate: number;
+}
+
 export interface DemoScenario {
   id: string;
+  /** Industry id (see `demo.industries`). */
+  industry: string;
   /** Label in the "Choose a scenario" selector. */
   label: string;
   /** Short description under the label. */
@@ -40,6 +59,12 @@ export interface DemoScenario {
     pricing?: DemoPricing;
     /** Budget constraint (budget scenario) - no invented composition or totals. */
     budget?: { limitNet: number; suggestionsTitle: string; suggestions: string[]; reviewNote: string };
+    /** Optional label overrides for non-product scenarios. */
+    quantityLabel?: string;
+    itemsLabel?: string;
+    /** Illustrative itemised calculation (values not from a real price list). */
+    quote?: DemoQuote;
+    reviewNote?: string;
     note: string;
   };
 }
@@ -60,6 +85,7 @@ export interface PricerCopy {
     title: string;
     lead: string;
     notice: string;
+    industryLabel: string;
     selectorLabel: string;
     emailLabel: string;
     toLabel: string;
@@ -83,7 +109,12 @@ export interface PricerCopy {
     budgetLabel: string;
     budgetPerBasket: string;
     formatsLabel: string;
+    illustrativeLabel: string;
+    totalNetLabel: string;
+    totalVatLabel: string;
+    totalGrossLabel: string;
     noscript: string;
+    industries: DemoIndustry[];
     scenarios: DemoScenario[];
   };
   benefits: { eyebrow: string; title: string; items: { title: string; text: string }[] };
@@ -161,6 +192,7 @@ const pl: PricerCopy = {
     title: "Sprawdź, jak Pricer zamienia wiadomość w ofertę.",
     lead: "Wybierz przykładowe zapytanie i zobacz, jak może wyglądać wynik procesu.",
     notice: "Przykładowa prezentacja działania - dane i wynik demonstracyjne.",
+    industryLabel: "Wybierz branżę",
     selectorLabel: "Wybierz scenariusz",
     emailLabel: "Wiadomość od klienta",
     toLabel: "Do",
@@ -189,11 +221,41 @@ const pl: PricerCopy = {
     budgetLabel: "Limit budżetu",
     budgetPerBasket: "netto / kosz",
     formatsLabel: "Format oferty",
+    illustrativeLabel: "Wartości ilustracyjne",
+    totalNetLabel: "Razem netto",
+    totalVatLabel: "VAT 23%",
+    totalGrossLabel: "Razem brutto",
     noscript:
       "Interaktywna prezentacja wymaga włączonego JavaScriptu. Poniżej przykładowe zapytanie i przykładowa oferta dla standardowego scenariusza.",
+    industries: [
+      { id: "gifts", label: "Upominki i prezenty firmowe", hint: "Katalog produktów, rabaty ilościowe, budżet" },
+      {
+        id: "architecture",
+        label: "Architektura",
+        hint: "Usługa wyceniana według parametrów projektu",
+        steps: [
+          "Analizowanie wiadomości",
+          "Rozpoznanie parametrów projektu",
+          "Obliczanie wyceny usługi",
+          "Przygotowanie oferty",
+        ],
+      },
+      {
+        id: "metal",
+        label: "Konstrukcje metalowe",
+        hint: "Zlecenie na wymiar: materiały, wymiary, usługi",
+        steps: [
+          "Analizowanie wiadomości",
+          "Rozpoznanie wymiarów i materiałów",
+          "Kalkulacja konstrukcji i usług",
+          "Przygotowanie oferty",
+        ],
+      },
+    ],
     scenarios: [
       {
         id: "standard",
+        industry: "gifts",
         label: "Kosze prezentowe - standardowe zapytanie",
         hint: "Pięć koszy o określonej zawartości",
         email: {
@@ -217,6 +279,7 @@ const pl: PricerCopy = {
       },
       {
         id: "budget",
+        industry: "gifts",
         label: "Kosze prezentowe - z limitem budżetu",
         hint: "Ta sama zawartość, maks. 90 zł netto za kosz",
         email: {
@@ -245,6 +308,86 @@ const pl: PricerCopy = {
             reviewNote: "Ofertę akceptujesz dopiero po sprawdzeniu propozycji.",
           },
           note: "Skład kosza i ceny zależą od katalogu i reguł Twojej firmy. Dane demonstracyjne.",
+        },
+      },
+      {
+        id: "house",
+        industry: "architecture",
+        label: "Projekt domu jednorodzinnego",
+        hint: "Wycena usługi projektowej, ok. 160 m²",
+        email: {
+          from: "Tomasz Wiśniewski",
+          subject: "Zapytanie o wycenę projektu domu jednorodzinnego",
+          body: "Dzień dobry,\n\nchciałbym zapytać o wycenę przygotowania indywidualnego projektu domu jednorodzinnego o powierzchni około 160 m².\n\nDom byłby parterowy z poddaszem użytkowym i garażem jednostanowiskowym. Interesuje nas nowoczesna, prosta bryła z przestronnym salonem połączonym z kuchnią.\n\nDziałka znajduje się w okolicach Warszawy i ma powierzchnię około 900 m².\n\nCzy mogą Państwo podać szacunkową cenę przygotowania projektu oraz orientacyjny termin realizacji?\n\nPozdrawiam\nTomasz Wiśniewski",
+        },
+        detected: [
+          { label: "Usługa", value: "indywidualny projekt domu jednorodzinnego" },
+          { label: "Powierzchnia", value: "ok. 160 m²" },
+          { label: "Bryła", value: "parter + poddasze użytkowe, nowoczesna" },
+          { label: "Garaż", value: "jednostanowiskowy" },
+          { label: "Działka", value: "ok. 900 m², okolice Warszawy" },
+          { label: "Klient pyta o", value: "cenę i termin realizacji", highlight: true },
+        ],
+        offer: {
+          title: "Oferta - projekt domu jednorodzinnego",
+          customer: "Tomasz Wiśniewski",
+          quantityLabel: "Przedmiot oferty",
+          quantity: "Indywidualny projekt domu",
+          itemsLabel: "Parametry projektu",
+          items: ["Ok. 160 m² powierzchni", "Parter z poddaszem użytkowym", "Garaż jednostanowiskowy", "Salon połączony z kuchnią", "Działka ok. 900 m²"],
+          quote: {
+            label: "Kalkulacja usługi",
+            vatRate: 0.23,
+            lines: [
+              { label: "Projekt indywidualny - stawka bazowa", detail: "160 m² × 120,00 zł/m²", amount: 19200 },
+              { label: "Poddasze użytkowe - złożoność", detail: "+10% stawki bazowej", amount: 1920 },
+              { label: "Garaż jednostanowiskowy w bryle budynku", detail: "ryczałt", amount: 2500 },
+              { label: "Analiza działki i uwarunkowań lokalnych", detail: "ryczałt", amount: 1800 },
+            ],
+          },
+          reviewNote: "Termin realizacji i ostateczną cenę biuro potwierdza po weryfikacji wyceny.",
+          note: "Pozycje, stawki i kwoty są ilustracyjne i nie pochodzą z rzeczywistego cennika. Dane demonstracyjne.",
+        },
+      },
+      {
+        id: "fence",
+        industry: "metal",
+        label: "Ogrodzenie z bramą i furtką",
+        hint: "Wykonanie, malowanie i montaż, ok. 45 mb",
+        email: {
+          from: "Michał Nowak",
+          subject: "Zapytanie o wycenę ogrodzenia posesji",
+          body: "Dzień dobry,\n\nproszę o wycenę wykonania i montażu ogrodzenia posesji wraz z bramą wjazdową.\n\nInteresuje mnie ogrodzenie metalowe o długości około 45 metrów, wykonane z poziomych profili stalowych w kolorze antracytowym. Zamówienie powinno obejmować także bramę przesuwną o szerokości 5 metrów oraz furtkę o szerokości około 1 metra.\n\nProszę o uwzględnienie w wycenie wykonania konstrukcji, malowania proszkowego oraz montażu na miejscu. Posesja znajduje się w okolicach Piaseczna.\n\nBędę wdzięczny za szacunkową cenę i termin realizacji.\n\nPozdrawiam\nMichał Nowak",
+        },
+        detected: [
+          { label: "Zlecenie", value: "wykonanie i montaż ogrodzenia" },
+          { label: "Długość", value: "ok. 45 mb" },
+          { label: "Materiał", value: "poziome profile stalowe, antracyt" },
+          { label: "Brama", value: "przesuwna, szer. 5 m" },
+          { label: "Furtka", value: "szer. ok. 1 m" },
+          { label: "Usługi", value: "malowanie proszkowe, montaż", highlight: true },
+          { label: "Lokalizacja", value: "okolice Piaseczna" },
+        ],
+        offer: {
+          title: "Oferta - ogrodzenie posesji",
+          customer: "Michał Nowak",
+          quantityLabel: "Przedmiot oferty",
+          quantity: "Ogrodzenie z bramą i furtką",
+          itemsLabel: "Parametry zamówienia",
+          items: ["Ogrodzenie ok. 45 mb", "Poziome profile stalowe, antracyt", "Brama przesuwna 5 m", "Furtka ok. 1 m", "Malowanie proszkowe", "Montaż na miejscu"],
+          quote: {
+            label: "Kalkulacja zamówienia",
+            vatRate: 0.23,
+            lines: [
+              { label: "Przęsła z poziomych profili stalowych", detail: "45 mb × 420,00 zł/mb", amount: 18900 },
+              { label: "Brama przesuwna, szer. 5 m", detail: "1 szt.", amount: 7800 },
+              { label: "Furtka, szer. ok. 1 m", detail: "1 szt.", amount: 1900 },
+              { label: "Malowanie proszkowe - antracyt", detail: "+12% wartości konstrukcji", amount: 3432 },
+              { label: "Montaż na miejscu", detail: "45 mb × 90,00 zł/mb + bramy 1 200,00 zł", amount: 5250 },
+            ],
+          },
+          reviewNote: "Termin realizacji i ostateczną cenę potwierdzasz po weryfikacji wyceny.",
+          note: "Pozycje, stawki i kwoty są ilustracyjne i nie pochodzą z rzeczywistego cennika. Dane demonstracyjne.",
         },
       },
     ],
@@ -349,6 +492,7 @@ const en: PricerCopy = {
     title: "See how Pricer turns a message into an offer.",
     lead: "Choose a sample enquiry and see what the result of the process can look like.",
     notice: "Illustrative demo - sample data and sample result.",
+    industryLabel: "Choose an industry",
     selectorLabel: "Choose a scenario",
     emailLabel: "Message from the customer",
     toLabel: "To",
@@ -372,11 +516,41 @@ const en: PricerCopy = {
     budgetLabel: "Budget limit",
     budgetPerBasket: "net / basket",
     formatsLabel: "Offer format",
+    illustrativeLabel: "Illustrative values",
+    totalNetLabel: "Total net",
+    totalVatLabel: "VAT 23%",
+    totalGrossLabel: "Total gross",
     noscript:
       "The interactive demo needs JavaScript. Below is the sample enquiry and sample offer for the standard scenario.",
+    industries: [
+      { id: "gifts", label: "Gift & Corporate Gifting", hint: "Product catalogue, quantity discounts, budget" },
+      {
+        id: "architecture",
+        label: "Architecture",
+        hint: "Service priced by project parameters",
+        steps: [
+          "Reading the message",
+          "Identifying the project parameters",
+          "Calculating the service quote",
+          "Preparing the offer",
+        ],
+      },
+      {
+        id: "metal",
+        label: "Metal Fabrication",
+        hint: "Custom order: materials, dimensions, services",
+        steps: [
+          "Reading the message",
+          "Identifying dimensions and materials",
+          "Calculating structure and services",
+          "Preparing the offer",
+        ],
+      },
+    ],
     scenarios: [
       {
         id: "standard",
+        industry: "gifts",
         label: "Gift baskets - standard enquiry",
         hint: "Five baskets with specified contents",
         email: {
@@ -400,6 +574,7 @@ const en: PricerCopy = {
       },
       {
         id: "budget",
+        industry: "gifts",
         label: "Gift baskets - with a budget limit",
         hint: "Same contents, max. PLN 90 net per basket",
         email: {
@@ -428,6 +603,86 @@ const en: PricerCopy = {
             reviewNote: "You approve the offer only after reviewing the proposal.",
           },
           note: "Basket contents and prices depend on your catalogue and rules. Sample data.",
+        },
+      },
+      {
+        id: "house",
+        industry: "architecture",
+        label: "Single-family house design",
+        hint: "Design service quote, approx. 160 m²",
+        email: {
+          from: "Tomasz Wiśniewski",
+          subject: "Request for a Quote for a Single-Family House Design",
+          body: "Hello,\n\nI would like to request a quote for preparing a custom design for a single-family house with an approximate floor area of 160 m².\n\nThe house would be single-storey with a usable attic and a single-car garage. We are interested in a modern, simple building design with a spacious living room connected to the kitchen.\n\nThe plot is located near Warsaw and has an area of approximately 900 m².\n\nCould you please provide an estimated price for preparing this design and an approximate project delivery timeline?\n\nBest regards,\nTomasz Wiśniewski",
+        },
+        detected: [
+          { label: "Service", value: "custom single-family house design" },
+          { label: "Floor area", value: "approx. 160 m²" },
+          { label: "Building", value: "single storey + usable attic, modern" },
+          { label: "Garage", value: "single-car" },
+          { label: "Plot", value: "approx. 900 m², near Warsaw" },
+          { label: "Customer asks for", value: "price and delivery timeline", highlight: true },
+        ],
+        offer: {
+          title: "Offer - single-family house design",
+          customer: "Tomasz Wiśniewski",
+          quantityLabel: "Subject of the offer",
+          quantity: "Custom house design",
+          itemsLabel: "Project parameters",
+          items: ["Approx. 160 m² floor area", "Single storey with usable attic", "Single-car garage", "Living room open to the kitchen", "Plot approx. 900 m²"],
+          quote: {
+            label: "Service calculation",
+            vatRate: 0.23,
+            lines: [
+              { label: "Custom design - base rate", detail: "160 m² × PLN 120.00/m²", amount: 19200 },
+              { label: "Usable attic - complexity", detail: "+10% of base rate", amount: 1920 },
+              { label: "Integrated single-car garage", detail: "flat fee", amount: 2500 },
+              { label: "Plot and local conditions analysis", detail: "flat fee", amount: 1800 },
+            ],
+          },
+          reviewNote: "The practice confirms the timeline and final price after reviewing the quote.",
+          note: "Items, rates and amounts are illustrative and do not come from a real price list. Sample data.",
+        },
+      },
+      {
+        id: "fence",
+        industry: "metal",
+        label: "Fencing with sliding and pedestrian gates",
+        hint: "Fabrication, coating and installation, approx. 45 m",
+        email: {
+          from: "Michał Nowak",
+          subject: "Request for a Quote for Property Fencing",
+          body: "Hello,\n\nI would like to request a quote for manufacturing and installing property fencing, including an entrance gate.\n\nI am interested in metal fencing approximately 45 meters long, made of horizontal steel profiles in anthracite grey. The order should also include a sliding gate with a width of 5 meters and a pedestrian gate approximately 1 meter wide.\n\nPlease include the manufacturing of the structure, powder coating, and on-site installation in the quotation. The property is located near Piaseczno.\n\nI would appreciate an estimated price and delivery timeline.\n\nBest regards,\nMichał Nowak",
+        },
+        detected: [
+          { label: "Order", value: "fencing fabrication and installation" },
+          { label: "Length", value: "approx. 45 m" },
+          { label: "Material", value: "horizontal steel profiles, anthracite" },
+          { label: "Gate", value: "sliding, 5 m wide" },
+          { label: "Pedestrian gate", value: "approx. 1 m wide" },
+          { label: "Services", value: "powder coating, installation", highlight: true },
+          { label: "Location", value: "near Piaseczno" },
+        ],
+        offer: {
+          title: "Offer - property fencing",
+          customer: "Michał Nowak",
+          quantityLabel: "Subject of the offer",
+          quantity: "Fencing with gates",
+          itemsLabel: "Order parameters",
+          items: ["Fencing approx. 45 m", "Horizontal steel profiles, anthracite", "Sliding gate 5 m", "Pedestrian gate approx. 1 m", "Powder coating", "On-site installation"],
+          quote: {
+            label: "Order calculation",
+            vatRate: 0.23,
+            lines: [
+              { label: "Fence panels, horizontal steel profiles", detail: "45 m × PLN 420.00/m", amount: 18900 },
+              { label: "Sliding gate, 5 m wide", detail: "1 pc", amount: 7800 },
+              { label: "Pedestrian gate, approx. 1 m wide", detail: "1 pc", amount: 1900 },
+              { label: "Powder coating - anthracite", detail: "+12% of structure value", amount: 3432 },
+              { label: "On-site installation", detail: "45 m × PLN 90.00/m + gates PLN 1,200.00", amount: 5250 },
+            ],
+          },
+          reviewNote: "You confirm the timeline and final price after reviewing the quote.",
+          note: "Items, rates and amounts are illustrative and do not come from a real price list. Sample data.",
         },
       },
     ],
